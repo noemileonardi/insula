@@ -8,7 +8,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'cache')
-SR = 22050
+SR = 48000
 VOICE_MODEL = '/tmp/claude-0/-home-user-insula/d5eedac9-3835-54e3-916a-789adeb7f8d4/scratchpad/voices/it_IT-paola-medium.onnx'
 W, H = 1080, 1920
 CAP_Y = 1360
@@ -28,10 +28,41 @@ def words_of(t):
     return res
 
 # ---------------------------------------------------------------- audio
+def read_audio(path):
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', path, '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True, check=True).stdout
+    return np.frombuffer(raw, dtype=np.float32).copy()
+
+# podcast-style chain: rumble cut, gentle denoise, warmth/presence EQ, de-ess, 2-stage compression, loudness -16 LUFS
+MASTER = ('highpass=f=75,lowpass=f=16000,afftdn=nf=-28:tn=1,'
+          'equalizer=f=180:t=q:w=1.2:g=1.5,equalizer=f=350:t=q:w=1.5:g=-2,equalizer=f=3200:t=q:w=1.2:g=2.5,equalizer=f=11000:t=h:w=0.7:g=1.5,'
+          'deesser=i=0.35,acompressor=threshold=-21dB:ratio=3:attack=4:release=90:makeup=3,'
+          'acompressor=threshold=-12dB:ratio=6:attack=1:release=40,alimiter=limit=0.89,loudnorm=I=-16:TP=-1.5:LRA=8')
+
+def master(audio):
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        a, b = os.path.join(d, 'a.wav'), os.path.join(d, 'b.wav')
+        with wave.open(a, 'wb') as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(audio, -1, 1) * 32767).astype(np.int16).tobytes())
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', a, '-af', MASTER, '-ar', str(SR), b], check=True)
+        # second pass: exact -16 LUFS integrated loudness, true-peak safe
+        r = subprocess.run(['ffmpeg', '-i', b, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
+        I = float(re.findall(r'I:\s+(-?[\d.]+) LUFS', r)[-1])
+        c = os.path.join(d, 'c.wav')
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', b, '-af', f'volume={-16 - I:.2f}dB,alimiter=limit=0.84:level=false', '-ar', str(SR), c], check=True)
+        out = read_audio(c)
+    return out[:len(audio)] if len(out) >= len(audio) else np.concatenate([out, np.zeros(len(audio) - len(out), np.float32)])
+
 _voice = None
 def tts(text, speed=0.9):
     global _voice
     os.makedirs(CACHE, exist_ok=True)
+    cb = os.path.join(CACHE, 'cbx', hashlib.md5(text.encode()).hexdigest()[:16] + '.wav')
+    if os.path.exists(cb):
+        a = read_audio(cb)
+        env = np.convolve(np.abs(a), np.ones(1024) / 1024, mode='same')
+        idx = np.where(env > 0.008)[0]
+        return a[max(0, idx[0] - 1200): idx[-1] + 2400] if len(idx) else a
     key = hashlib.md5((text + str(speed)).encode()).hexdigest()[:16]
     p = os.path.join(CACHE, key + '.wav')
     if not os.path.exists(p):
@@ -41,13 +72,12 @@ def tts(text, speed=0.9):
         from piper.config import SynthesisConfig
         with wave.open(p, 'wb') as w:
             _voice.synthesize_wav(text, w, syn_config=SynthesisConfig(length_scale=speed))
-    with wave.open(p) as w:
-        a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+    a = read_audio(p)
     # trim silence
-    env = np.convolve(np.abs(a), np.ones(256) / 256, mode='same')
+    env = np.convolve(np.abs(a), np.ones(512) / 512, mode='same')
     idx = np.where(env > 0.01)[0]
     if len(idx):
-        a = a[max(0, idx[0] - 400): idx[-1] + 600]
+        a = a[max(0, idx[0] - 900): idx[-1] + 1300]
     return a
 
 def synth_sfx():
@@ -97,10 +127,15 @@ def align_real_voice(beats, path):
     from pywhispercpp.model import Model
     tmp = os.path.join(CACHE, 'voice16k.wav')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', path, '-ar', '16000', '-ac', '1', tmp], check=True)
-    m = Model('small', n_threads=os.cpu_count(), language='it', print_progress=False,
-              token_timestamps=True, max_len=1, split_on_word=True)
-    segs = m.transcribe(tmp)
-    hw = [(re.sub(r'[^\wàèéìòù]', '', s.text.lower()), s.t0 / 100, s.t1 / 100) for s in segs if s.text.strip()]
+    ck = os.path.join(CACHE, 'align_' + hashlib.md5(open(path, 'rb').read()).hexdigest()[:12] + '.json')
+    if os.path.exists(ck):
+        hw = [tuple(x) for x in json.load(open(ck))]
+    else:
+        m = Model('small', n_threads=os.cpu_count(), language='it', print_progress=False,
+                  token_timestamps=True, max_len=1, split_on_word=True)
+        segs = m.transcribe(tmp)
+        hw = [(re.sub(r'[^\wàèéìòù]', '', s.text.lower()), s.t0 / 100, s.t1 / 100) for s in segs if s.text.strip()]
+        json.dump(hw, open(ck, 'w'))
     sw = []
     for bi, b in enumerate(beats):
         for wi, (w, e) in enumerate(words_of(b['t'])):
@@ -127,11 +162,7 @@ def align_real_voice(beats, path):
         idx = [k for k, x in enumerate(sw) if x[1] == bi]
         wt = [list(times[k]) for k in idx]
         tl.append(dict(beat=b, start=wt[0][0], end=wt[-1][1], words=ws, wt=wt))
-    with wave.open(tmp) as w:
-        a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
-    # resample 16k->22.05k
-    x = np.linspace(0, len(a) - 1, int(len(a) * SR / 16000))
-    return np.interp(x, np.arange(len(a)), a).astype(np.float32), tl
+    return read_audio(path), tl
 
 # ---------------------------------------------------------------- 3D icons
 ICON_SRC = '/tmp/claude-0/-home-user-insula/d5eedac9-3835-54e3-916a-789adeb7f8d4/scratchpad/icons/lobehub-fluent-emoji-3d-1.1.0/package/assets'
@@ -186,28 +217,28 @@ def anim(doc, eid, kind, t, extra=None):
     if kind == 'pop':
         F('{scale:0.2,opacity:0,rotationY:-110,z:-300}', '{scale:1,opacity:1,rotationY:0,z:0}', 0.6, 'back.out(1.7)'); doc.sfx.append(('pop', t))
     elif kind == 'stamp':
-        F('{scale:2.6,opacity:0,rotation:-14,z:500}', '{scale:1,opacity:1,rotation:-4,z:0}', 0.32, 'power4.in'); doc.sfx.append(('pop', t + 0.3))
+        F('{scale:2.6,opacity:0,rotation:-14,z:500}', '{scale:1,opacity:1,rotation:-4,z:0}', 0.32, 'power4.in'); doc.sfx.append(('stamp', t + 0.3))
     elif kind == 'up':
         F('{y:160,opacity:0,rotationX:-70,z:-200}', '{y:0,opacity:1,rotationX:0,z:0}', 0.6, 'power3.out')
     elif kind == 'down':
         F('{y:-160,opacity:0,rotationX:70,z:-200}', '{y:0,opacity:1,rotationX:0,z:0}', 0.6, 'power3.out')
     elif kind == 'left':
-        F('{x:-1100,rotationY:-80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('whoosh', t))
+        F('{x:-1100,rotationY:-80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('swipe', t))
     elif kind == 'right':
-        F('{x:1100,rotationY:80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('whoosh', t))
+        F('{x:1100,rotationY:80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('swipe', t))
     elif kind in ('walkl', 'walkr'):
         sg = -1 if kind == 'walkl' else 1
         doc.js.append(f'tl.fromTo({e},{{x:{sg*900},opacity:1}},{{x:0,duration:1.1,ease:"power1.out"}},{t:.3f});')
         doc.js.append(f'tl.fromTo({e},{{y:0}},{{y:-34,duration:0.14,yoyo:true,repeat:7,ease:"sine.out"}},{t:.3f});')
         doc.js.append(f'tl.fromTo({e},{{rotation:{-6*sg}}},{{rotation:{6*sg},duration:0.14,yoyo:true,repeat:7,ease:"sine.inOut"}},{t:.3f});')
         doc.js.append(f'tl.to({e},{{rotation:0,duration:0.2}},{t + 1.12:.3f});')
-        doc.sfx.append(('whoosh', t))
+        for k in range(4): doc.sfx.append(('step', t + 0.14 + k * 0.28))
     elif kind == 'fade':
         F('{opacity:0,z:-150}', '{opacity:1,z:0}', 0.5, 'power2.out')
     elif kind == 'zoom':
-        F('{z:-1400,opacity:0,rotationX:25}', '{z:0,opacity:1,rotationX:0}', 0.8, 'power3.out'); doc.sfx.append(('whoosh', t))
+        F('{z:-1400,opacity:0,rotationX:25}', '{z:0,opacity:1,rotationX:0}', 0.8, 'power3.out'); doc.sfx.append(('swipe', t))
     elif kind == 'spin':
-        F('{rotationY:-540,scale:0.3,opacity:0,z:-400}', '{rotationY:0,scale:1,opacity:1,z:0}', 1.0, 'power3.out'); doc.sfx.append(('whoosh', t))
+        F('{rotationY:-540,scale:0.3,opacity:0,z:-400}', '{rotationY:0,scale:1,opacity:1,z:0}', 1.0, 'power3.out'); doc.sfx.append(('boom', t + 0.25))
     elif kind == 'flip':
         F('{rotationX:-180,opacity:0}', '{rotationX:0,opacity:1}', 0.7, 'back.out(1.4)'); doc.sfx.append(('pop', t))
     elif kind == 'grow':
@@ -290,6 +321,7 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
                 for i, ch in enumerate(txt):
                     out += f'<span id="{eid}t{i}" style="display:none">{esc(ch)}</span>'
                     doc.js.append(f'tl.set("#{eid}t{i}",{{display:"inline"}},{tt + i * rate:.3f});')
+                    if ch != ' ': doc.sfx.append(('key', tt + i * rate))
                 return out + f'<span class="caret" id="{eid}k">|</span>'
             inner = re.sub(r'\{\{TYPE:(.*?)\}\}', _typ, inner)
             n = int(max(1, (scene_end - tt) / 0.5))
@@ -327,6 +359,13 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
         else:
             doc.js.append(f'tl.to("#{eid}i",{{y:-14,duration:{life:.2f},ease:"sine.inOut"}},{t + 0.5:.3f});')
     anim(doc, eid, it.get('in', 'pop'), t)
+    if it.get('in', 'pop') == 'pop' and doc.sfx and doc.sfx[-1] == ('pop', t):
+        if k in ('chip', 'tag'): doc.sfx[-1] = ('click', t)
+        elif k == 'html' and ('bubble' in it['html'] or 'Nuova prenotazione' in it['html']): doc.sfx[-1] = ('ding', t)
+    elif k == 'html' and ('bubble' in it['html'] or 'Nuova prenotazione' in it['html']):
+        doc.sfx.append(('ding', t))
+    if k == 'count':
+        doc.sfx.append(('riser', t)); doc.sfx.append(('sparkle', t + it.get('dur', 1.2) - 0.05))
     # optional exit / emphasis
     if 'out' in it:
         ot = tl_words[it['out']][0] if isinstance(it['out'], int) else t0 + float(it['out'])
@@ -338,11 +377,13 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
         st = tl_words[sg['at']][0] if isinstance(sg.get('at'), int) else t + float(sg.get('dt', 0))
         doc.js.append(f'tl.fromTo("#{eid} {sg["sel"]}",{json.dumps(sg.get("frm",{"opacity":0,"scale":0.3}))},'
                       f'Object.assign({json.dumps(sg.get("to",{"opacity":1,"scale":1}))},{{duration:{sg.get("d",0.35)},stagger:{sg.get("each",0.05)},ease:"{sg.get("ease","back.out(1.8)")}"}}),{st:.3f});')
-        if sg.get('sfx'): doc.sfx.append(('pop', st))
+        if sg.get('sfx'):
+            for q in range(8): doc.sfx.append(('click', st + q * sg.get('each', 0.05) * 1.6))
     if 'strike' in it:
         sid = doc.id(); st = tl_words[it['strike']][0] if isinstance(it['strike'], int) else t0 + float(it['strike'])
         doc.html[-1] = doc.html[-1][:-12] + f'<div id="{sid}" class="strike"></div></div></div>'
         doc.js.append(f'tl.fromTo("#{sid}",{{scaleX:0}},{{scaleX:1,duration:0.35,ease:"power2.out"}},{st:.3f});')
+        doc.sfx.append(('swipe', st))
     return eid
 
 CSS = open(os.path.join(ROOT, 'tools', 'style.css')).read() if os.path.exists(os.path.join(ROOT, 'tools', 'style.css')) else ''
@@ -448,18 +489,20 @@ tl.seek(0);
     return page, doc.sfx
 
 def mix(audio, sfx):
-    pop, whoosh = synth_sfx()
+    from sfx import kit, LEVEL
+    K = kit(SR)
     out = audio.copy()
     last = {}
     for kind, t in sorted(sfx, key=lambda x: x[1]):
-        if t < 0: continue
-        if t - last.get(kind, -9) < 0.25: continue
+        if t < 0 or kind not in K: continue
+        gap = 0.03 if kind in ('key', 'step', 'click') else 0.2
+        if t - last.get(kind, -9) < gap: continue
         last[kind] = t
-        s = pop if kind == 'pop' else whoosh
+        s = K[kind] * LEVEL[kind]
         i = int(t * SR)
         if i + len(s) > len(out):
             out = np.concatenate([out, np.zeros(i + len(s) - len(out), np.float32)])
-        out[i:i + len(s)] += s * (0.55 if kind == 'pop' else 0.8)
+        out[i:i + len(s)] += s
     return np.clip(out, -1, 1)
 
 def main():
@@ -468,7 +511,12 @@ def main():
     sys.path.insert(0, os.path.join(ROOT, 'tools'))
     import specs
     beats = specs.VIDEOS[name]
+    if '--dump' in sys.argv:
+        json.dump([clean(b['t']) for b in beats], open(os.path.join(CACHE, f'{name}_beats.json'), 'w'), ensure_ascii=False, indent=1)
+        print('dumped', len(beats)); return
     tl, audio = build_timeline(beats, voice)
+    if '--no-master' not in sys.argv:
+        audio = master(audio)
     total = max(len(audio) / SR, tl[-1]['end'] + specs.TAIL.get(name, 2.5))
     audio = np.concatenate([audio, np.zeros(int(total * SR) - len(audio) + 10, np.float32)])
     page, sfx = build_html(name, tl, total)
