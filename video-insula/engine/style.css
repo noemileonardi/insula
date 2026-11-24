@@ -1,0 +1,51 @@
+@font-face{font-family:"Noto Color Emoji";src:url(assets/fonts/NotoColorEmoji.ttf) format("truetype")}
+@font-face{font-family:"Instrument Serif";src:url(assets/fonts/instrument-serif-latin-400-normal.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"Instrument Serif";src:url(assets/fonts/instrument-serif-latin-400-italic.woff2) format("woff2");font-style:italic}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#fff}
+#root{position:relative;perspective:1500px;perspective-origin:50% 42%;width:1080px;height:1920px;overflow:hidden;background:#fff;font-family:Inter,sans-serif;color:#111}
+.scene{position:absolute;inset:0;overflow:hidden;transform-style:preserve-3d;backface-visibility:hidden}
+.cam{position:absolute;inset:0;transform-origin:50% 45%;transform-style:preserve-3d}
+.in3d{transform-style:preserve-3d}
+.it{transform-style:preserve-3d}
+.ico img{filter:drop-shadow(0 34px 34px rgba(0,0,0,.22))}
+.ei{height:1.05em;width:1.05em;vertical-align:-0.18em;display:inline-block}
+.floorwrap{position:absolute;inset:0;perspective:1200px;perspective-origin:50% 40%;transform-style:flat;pointer-events:none}
+.floor{position:absolute;left:-60%;width:220%;top:1120px;height:1600px;transform:rotateX(78deg);transform-origin:50% 0;background-image:linear-gradient(rgba(0,0,0,.045) 2px,transparent 2px),linear-gradient(90deg,rgba(0,0,0,.045) 2px,transparent 2px);background-size:120px 120px;-webkit-mask-image:linear-gradient(180deg,transparent,#000 30%,transparent 90%);mask-image:linear-gradient(180deg,transparent,#000 30%,transparent 90%)}
+.scene.dark .floor{background-image:linear-gradient(rgba(255,255,255,.08) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.08) 2px,transparent 2px)}
+.it{position:absolute;white-space:nowrap;will-change:transform}
+.sans{font-family:Inter,sans-serif;font-weight:600;letter-spacing:-0.02em}
+.serif{font-family:"Instrument Serif",serif;letter-spacing:-0.01em}
+
+.chip{border-radius:999px;padding:6px 30px 10px;font-style:italic;box-shadow:0 10px 30px rgba(39,71,245,.25)}
+.tag{padding:2px 16px 6px;font-style:italic;font-weight:400}
+.dbox{border:4px dashed;border-radius:6px}
+.strike{position:absolute;left:-4%;top:52%;width:108%;height:8px;background:#D7192B;border-radius:4px;transform-origin:left center}
+.caret{color:#2747F5;margin-left:2px}
+.cap{position:absolute;left:0;width:1080px;text-align:center;font-family:Inter,sans-serif;font-weight:600;font-size:66px;letter-spacing:-0.02em;color:#111}
+.cap.dark{color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.6)}
+.cap.em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;font-size:104px;color:#5B3A66}
+.cap.dark.em{color:#F1E3FF}
+.wm{position:absolute;right:46px;top:150px;display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(120,120,120,.55);font-family:Inter;font-weight:700;font-size:15px;letter-spacing:.04em;z-index:50}
+/* widgets */
+.card{background:#F3F3F3;border-radius:34px;box-shadow:0 20px 50px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:Inter;font-weight:600}
+.phone{width:520px;height:1040px;border-radius:70px;background:#111;padding:16px;box-shadow:0 40px 90px rgba(0,0,0,.25)}
+.phone .scr{width:100%;height:100%;border-radius:56px;background:#fff;overflow:hidden;position:relative;font-family:Inter}
+.notch{position:absolute;left:50%;top:14px;width:150px;height:38px;margin-left:-75px;border-radius:20px;background:#111;z-index:5}
+.cal{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;width:760px;padding:34px;background:#fff;border-radius:34px;box-shadow:0 30px 70px rgba(0,0,0,.12);font-family:Inter}
+.cal .hd{font-weight:700;color:#999;font-size:26px;text-align:center}
+.cal .cell{height:86px;border-radius:14px;background:#F2F2F2;position:relative;overflow:hidden}
+.cal .cell i{position:absolute;inset:8px;border-radius:9px;display:block}
+.bubble{background:#E9E9EB;color:#111;border-radius:40px;padding:22px 36px;font-family:Inter;font-weight:500;font-size:40px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.bubble.me{background:#2747F5;color:#fff}
+.bar{position:absolute;bottom:0;transform-origin:50% 100%;border-radius:10px 10px 0 0}
+.serp{width:900px;background:#fff;border-radius:30px;box-shadow:0 30px 80px rgba(0,0,0,.14);padding:34px;font-family:Inter;text-align:left;white-space:normal}
+.site{width:600px;height:1000px;border-radius:40px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.18);background:#fff;font-family:Inter;text-align:left;white-space:normal;position:relative}
+.btn{background:#1E3A2F;color:#F4EEE3;border-radius:999px;padding:30px 60px;font-family:Inter;font-weight:700;font-size:46px;box-shadow:0 20px 50px rgba(30,58,47,.35)}
+.stamp{border:8px solid #D7192B;color:#D7192B;font-family:Inter;font-weight:900;font-size:84px;padding:6px 30px;border-radius:14px;letter-spacing:.02em}
+.stamp.ok{border-color:#1E9E52;color:#1E9E52}
+.post{width:640px;background:#fff;border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,.14);overflow:hidden;font-family:Inter;text-align:left;white-space:normal}
+.tile{border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;font-family:"Instrument Serif";font-style:italic;line-height:1.05}
+
+.phone .scr,.phone .scr *{white-space:normal}
+.it .tile{white-space:normal}
