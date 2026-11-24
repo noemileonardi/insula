@@ -122,7 +122,7 @@ def bars(vals, x=540, y=1000, h=600, w=150, gap=60, colors=None, labels=None, be
 def yt_channel(photo, x=540, y=740, **k):
     return HT(f'''<div style="width:920px;background:#fff;border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.14);overflow:hidden;text-align:left;font-family:Inter;white-space:normal">
 <div style="height:200px;background:linear-gradient(90deg,#0c2340,#1f5fa8)"></div>
-<div style="display:flex;gap:30px;padding:0 40px;margin-top:-70px;align-items:flex-end"><div style="width:190px;height:190px;border-radius:50%;border:8px solid #fff;background:url({photo}) center/86% no-repeat #E9EEF8;flex:none"></div>
+<div style="display:flex;gap:30px;padding:0 40px;margin-top:-70px;align-items:flex-end"><div style="width:190px;height:190px;border-radius:50%;border:8px solid #fff;background:url({photo}) center 30%/cover #E9EEF8;flex:none"></div>
 <div style="padding-bottom:12px"><div style="font-size:54px;font-weight:800">Doctor Mike <span style="font-size:36px;color:#888">✔</span></div><div style="font-size:30px;color:#666">@DoctorMike</div></div></div>
 <div style="padding:26px 40px 36px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:34px;color:#444"><b id="ytsubs" style="color:#111">~15 Mln</b> iscritti</div>
 <div style="background:#111;color:#fff;border-radius:999px;padding:18px 40px;font-size:32px;font-weight:700">Iscriviti</div></div></div>''', x, y, **k)

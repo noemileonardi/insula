@@ -101,10 +101,17 @@ SITO = [
 ]
 
 # =====================================================================================
-MIKE = 'assets/icons/1f468-1f3fc-200d-2695-fe0f.png'   # 3D icon avatar for Doctor Mike
+MIKE = 'assets/img/mike_scrubs.jpg'        # photos supplied by the client
+MIKE_R = 'assets/img/mike_ritratto.jpg'
+def CUT(name, x, y, h, **k):
+    from PIL import Image
+    w0, h0 = Image.open(f'assets/img/{name}_cut.png').size
+    d = dict(k='img', src=f'assets/img/{name}_cut.png', x=x, y=y, w=int(h * w0 / h0), h=h, r=0, fit='contain', depth=150,
+             style='filter:drop-shadow(0 40px 40px rgba(0,0,0,.25));-webkit-mask-image:linear-gradient(180deg,#000 85%,transparent);mask-image:linear-gradient(180deg,#000 85%,transparent);')
+    d.update(k); return d
 
 def mag(x=540, y=740, **k):
-    return HT(f'''<div style="width:600px;height:800px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.25);background:url({MIKE}) center 62%/80% no-repeat, linear-gradient(160deg,#2747F5,#0c2340);font-family:Inter;color:#fff;text-align:left;white-space:normal;overflow:hidden">
+    return HT(f'''<div style="width:600px;height:800px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.25);background:url({MIKE}) center 20%/cover #0c2340;font-family:Inter;color:#fff;text-align:left;white-space:normal;overflow:hidden">
 <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 35%,rgba(0,0,0,.75))"></div>
 <div style="position:absolute;top:24px;left:30px;font-size:110px;font-weight:900;letter-spacing:-.04em;color:#D7192B">RIVISTA</div>
 <div style="position:absolute;top:150px;right:30px;font-size:30px;font-weight:700">2015</div>
@@ -114,7 +121,7 @@ def card3(n, label, bg, y, at):
     return o(HT(f'<div class="card" style="width:820px;height:190px;flex-direction:row;gap:30px;background:{bg}"><span class="serif" style="font-size:110px;font-style:italic;color:#E8901C">{n}</span><span style="font-size:52px">{label}</span></div>', 540, y), at=at)
 
 BRAND = [
- dict(t="Questo è un medico di famiglia del New Jersey.", v=S(o(E('👨‍⚕️', 540, 700, 384), in_='left'),
+ dict(t="Questo è un medico di famiglia del New Jersey.", v=S(o(CUT('mike_scrubs', 540, 700, 860), in_='left'),
         o(chip('medico di famiglia', 540, 1130, bg='green'), at='medico'), o(chip('🇺🇸 New Jersey', 780, 340, bg='blue', size=40), at='Jersey'))),
  dict(t="Ed è anche uno dei medici più seguiti *del pianeta*: / circa quindici milioni di iscritti su YouTube.", v=S(
         o(E('🌍', 540, 500, 300), in_='spin', at='seguiti'),
@@ -122,17 +129,17 @@ BRAND = [
         o(T('iscritti su YouTube', 540, 1010, 54), at='iscritti'), o(T('Fonte: Wikipedia / Social Blade, 2026', 540, 1100, 26, c='grey'), in_='fade', at='YouTube'))),
  dict(t="Si chiama Mikhail Varshavski. / Ma tu probabilmente lo conosci come *Doctor Mike*.", v=S(
         o(T('Mikhail Varshavski', 540, 440, 76, font='serif', i=True), in_='up', out='Ma'),
-        o(yt_channel(MIKE, 540, 740), in_='up', at='Ma'))),
+        o(yt_channel(MIKE_R, 540, 740), in_='up', at='Ma'))),
  dict(t="Nel 2015 una rivista americana lo nomina «il dottore più sexy d'America».", v=S(o(mag(540, 720), in_='zoom'), o(tag('2015', 860, 300, size=60), at='2015'))),
  dict(t="Poteva diventare l'ennesimo bel ragazzo di Instagram / e sparire dopo una stagione.", v=S(
-        o(HT(f'<div class="post"><div style="display:flex;align-items:center;gap:16px;padding:22px 26px"><div style="width:62px;height:62px;border-radius:50%;background:url({MIKE}) center/86% no-repeat #E9EEF8"></div><div style="font-weight:700;font-size:28px">dr.mike</div></div><div style="height:560px;background:url({MIKE}) center/86% no-repeat #E9EEF8"></div><div style="padding:20px 28px;font-size:34px">🔥🔥🔥 <b>virale</b></div></div>', 540, 700, style='transform:scale(.8)'), in_='up', out='sparire'),
+        o(HT(f'<div class="post"><div style="display:flex;align-items:center;gap:16px;padding:22px 26px"><div style="width:62px;height:62px;border-radius:50%;background:url({MIKE}) center 20%/cover #E9EEF8"></div><div style="font-weight:700;font-size:28px">dr.mike</div></div><div style="height:560px;background:url({MIKE}) center 20%/cover #E9EEF8"></div><div style="padding:20px 28px;font-size:34px">🔥🔥🔥 <b>virale</b></div></div>', 540, 700, style='transform:scale(.8)'), in_='up', out='sparire'),
         o(T('sparire?', 540, 700, 120, font='serif', i=True, c='grey'), at='sparire'))),
  dict(t="Invece, / dieci anni dopo, / è ancora lì.", v=S(
         o(HT('<div style="width:860px;height:10px;background:#111;border-radius:5px"></div>', 540, 760), in_='growx', at='dieci'),
         o(chip('2015', 150, 650, bg='#9A9A9A'), at='Invece'), o(chip('2026', 930, 650, bg='red'), at='dopo'),
-        o(E('📈', 540, 520, 220), at='ancora'))),
+        o(CUT('mike_palco', 540, 470, 560), at='ancora', in_='up'))),
  dict(t="Il motivo sono *tre scelte di brand* / che puoi copiare anche tu, / anche se non vuoi diventare famoso.", v=S(
-        o(E('👨‍⚕️', 540, 760, 260), in_='zoom'),
+        o(CUT('mike_ritratto', 540, 780, 560), in_='zoom'),
         o(T('1', 260, 470, 150, font='serif', i=True, c='orange'), at='tre'), o(T('2', 540, 380, 150, font='serif', i=True, c='orange'), at='scelte'),
         o(T('3', 820, 470, 150, font='serif', i=True, c='orange'), at='brand'), o(chip('copiabili', 540, 1080, bg='violet'), at='copiare'))),
 
@@ -160,7 +167,7 @@ BRAND = [
         o(T('«Il limone cura tutto»', 540, 520, 60, font='serif', i=True), at='Smonta', strike='miti'), o(T('«Il caffè fa male al cuore»', 540, 700, 60, font='serif', i=True), at='gente', strike='trova'),
         o(T('«Antibiotici per il raffreddore»', 540, 880, 58, font='serif', i=True), at='già', strike='social'))),
  dict(t="Così sposta l'attenzione / dalla sua faccia / alla sua *competenza*.", v=S(
-        o(E('👨‍⚕️', 280, 720, 204), at='faccia'), o(T('→', 540, 720, 140, c='violet'), at='alla'),
+        o(CUT('mike_scrubs', 280, 720, 520), at='faccia', in_='left'), o(T('→', 540, 720, 140, c='violet'), at='alla'),
         o(E('🩺', 800, 720, 240), at='competenza'), o(chip('competenza', 800, 950, bg='green'), at='competenza'))),
  dict(t="Da «il dottore bello» / a «il dottore di cui mi fido».", v=S(
         o(chip('il dottore bello', 540, 560, bg='#9A9A9A', size=56), at=0, strike='a'), o(T('↓', 540, 720, 120, c='violet'), at='a'),
@@ -179,7 +186,7 @@ BRAND = [
  dict(t="Tratta il suo brand come tratta l'ambulatorio: / con orari, / persone / e processi.", v=S(
         o(E('🏥', 540, 520, 260), in_='pop'), o(chip('🕐 orari', 540, 800, bg='green'), at='orari'), o(chip('👥 persone', 540, 930, bg='violet'), at='persone'), o(chip('⚙️ processi', 540, 1060, bg='#B39874'), at='processi'))),
  dict(t="E intanto / continua a fare il medico. / Ed è proprio questo che lo rende credibile.", v=S(
-        o(E('👨‍⚕️', 540, 660, 322), in_='zoom'), o(chip('medico in attività', 540, 360, bg='green'), at='medico'),
+        o(CUT('mike_scrubs', 540, 700, 760), in_='zoom'), o(chip('medico in attività', 540, 360, bg='green'), at='medico'),
         o(HT('<div class="stamp ok" style="background:#fff">CREDIBILE</div>', 540, 1040), in_='stamp', at='credibile'))),
  dict(t="E qui arriva la parte che ti interessa.", v=BLANK, p=0.3),
  dict(t="Non devi diventare Doctor Mike.", v=S(o(T('Doctor Mike', 540, 700, 140, font='serif', i=True), in_='pop', strike='Mike'))),
