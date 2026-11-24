@@ -7,7 +7,7 @@ norm = lambda s: re.sub(r'[^a-zàèéìòù0-9 ]', '', s.lower().replace("'", ' 
 bad = []
 for v in sys.argv[1:]:
     for t in json.load(open(f'{ROOT}/cache/{v}_beats.json')):
-        p = f'{ROOT}/cache/cbx/' + hashlib.md5(t.encode()).hexdigest()[:16] + '.wav'
+        p = f'{ROOT}/cache/cbx_clean/' + hashlib.md5(t.encode()).hexdigest()[:16] + '.wav'
         subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', p, '-ar', '16000', '-ac', '1', '/tmp/qa.wav'], check=True)
         got = ' '.join(s.text for s in m.transcribe('/tmp/qa.wav'))
         r = difflib.SequenceMatcher(a=norm(t), b=norm(got)).ratio()

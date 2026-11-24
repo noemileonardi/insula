@@ -95,7 +95,7 @@ _voice = None
 def tts(text, speed=0.9):
     global _voice
     os.makedirs(CACHE, exist_ok=True)
-    cb = os.path.join(CACHE, 'cbx', hashlib.md5(text.encode()).hexdigest()[:16] + '.wav')
+    cb = os.path.join(CACHE, 'cbx_clean', hashlib.md5(text.encode()).hexdigest()[:16] + '.wav')
     if os.path.exists(cb):
         a = read_audio(cb)
         env = np.convolve(np.abs(a), np.ones(1024) / 1024, mode='same')
