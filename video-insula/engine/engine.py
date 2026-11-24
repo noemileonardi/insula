@@ -266,6 +266,22 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
         inner = f'<img src="{it["src"]}" style="width:100%;height:100%;object-fit:{it.get("fit","cover")};object-position:{it.get("pos","center")}">'
     elif k == 'html':
         inner = emojify(it['html'])
+        if '{{TYPE:' in inner:
+            tt = t + 0.5
+            if 'type_at' in it:
+                ta = it['type_at']
+                ta = _wi(ta, words) if isinstance(ta, str) else ta
+                tt = tl_words[ta][0] if isinstance(ta, int) else t + float(ta)
+            rate = it.get('rate', 0.11)
+            def _typ(m):
+                txt = m.group(1); out = ''
+                for i, ch in enumerate(txt):
+                    out += f'<span id="{eid}t{i}" style="display:none">{esc(ch)}</span>'
+                    doc.js.append(f'tl.set("#{eid}t{i}",{{display:"inline"}},{tt + i * rate:.3f});')
+                return out + f'<span class="caret" id="{eid}k">|</span>'
+            inner = re.sub(r'\{\{TYPE:(.*?)\}\}', _typ, inner)
+            n = int(max(1, (scene_end - tt) / 0.5))
+            doc.js.append(f'tl.to("#{eid}k",{{opacity:0,duration:0.25,yoyo:true,repeat:{n},ease:"steps(1)"}},{tt:.3f});')
         if it.get('cls'): cls += ' ' + it['cls']
     elif k == 'count':
         style += f'font-size:{it.get("size",200)}px;color:{ACC.get(it.get("c","ink"), it.get("c","ink"))};'
@@ -331,6 +347,18 @@ def build_html(name, tl, total):
             scenes[-1]['beats'].append(b)
     for si, sc in enumerate(scenes):
         sc['end'] = scenes[si + 1]['start'] if si + 1 < len(scenes) else total
+        # AI 3D scene available? swap in the full-bleed image version of this scene
+        alt = sc['v'].get('ai')
+        if alt:
+            for ext in ('png', 'jpg'):
+                p = os.path.join(ROOT, 'assets', 'scenes', f"{alt['id']}.{ext}")
+                if os.path.exists(p):
+                    img = dict(k='img', src=f"assets/scenes/{alt['id']}.{ext}", x=540, y=960, w=1240, h=2204, r=0, depth=-120, idle=False)
+                    img['in'] = 'fade'
+                    shade = dict(k='html', html='<div style="width:1240px;height:2204px;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.45) 85%)"></div>', x=540, y=960, idle=False, depth=-110)
+                    shade['in'] = 'none'
+                    sc['v'] = dict(items=[img, shade] + alt.get('items', []), dark=True, bg='#111', capy=alt.get('capy', 1300), cam=1.14)
+                    break
     TR = [('{rotationY:-55,x:760,z:-500,opacity:0}', '{rotationY:55,x:-760,z:-500,opacity:0}'),
           ('{rotationX:50,y:-900,z:-400,opacity:0}', '{rotationX:-50,y:900,z:-400,opacity:0}'),
           ('{rotationY:55,x:-760,z:-500,opacity:0}', '{rotationY:-55,x:760,z:-500,opacity:0}'),

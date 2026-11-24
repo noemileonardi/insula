@@ -128,7 +128,8 @@ def yt_channel(photo, x=540, y=740, **k):
 <div style="background:#111;color:#fff;border-radius:999px;padding:18px 40px;font-size:32px;font-weight:700">Iscriviti</div></div></div>''', x, y, **k)
 
 def cta(word, x=540, y=900, **k):
+    k.setdefault('type_at', word); k.setdefault('rate', 0.16)
     return HT(f'''<div style="width:900px;background:#fff;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.16);padding:34px 36px;text-align:left;font-family:Inter;white-space:normal">
 <div style="font-size:30px;font-weight:700;margin-bottom:20px">Commenti</div>
 <div style="display:flex;gap:18px;align-items:center"><div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#CDB8D8,#1E3A2F);flex:none"></div>
-<div style="flex:1;border:3px solid #e5e5e5;border-radius:999px;padding:20px 30px;font-size:44px;font-weight:800;color:#111;letter-spacing:.04em" id="ctaf">&nbsp;</div><div style="font-size:34px;font-weight:800;color:#2747F5">Pubblica</div></div></div>''', x, y, **k)
+<div style="flex:1;border:3px solid #e5e5e5;border-radius:999px;padding:20px 30px;font-size:44px;font-weight:800;color:#111;letter-spacing:.04em;min-height:110px">{{{{TYPE:{word}}}}}</div><div style="font-size:34px;font-weight:800;color:#2747F5">Pubblica</div></div></div>''', x, y, **k)

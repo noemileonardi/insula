@@ -39,8 +39,7 @@ SITO = [
         o(T('23:00', 540, 520, 220, c='#F4EEE3'), in_='zoom'),
         o(E('❤️', 540, 860, 240), at='cuore', shake=0.2), bg=NIGHT, dark=True)),
  dict(t="Prende il telefono / e scrive: «cardiologo Palermo».", v=S(
-        o(phone('<div style="padding:110px 26px 0"><div style="font-size:44px;font-weight:800;text-align:center;margin-bottom:26px">Google</div><div style="border:3px solid #ddd;border-radius:999px;height:84px"></div></div>', 540, 760, 0.95), in_='up'),
-        o(dict(k='type', s='cardiologo Palermo', x=540, y=438, size=34, rate=0.06), in_='none', at='scrive'), bg=NIGHT, dark=True)),
+        o(phone('<div style="padding:150px 26px 0"><div style="font-size:56px;font-weight:800;text-align:center;margin-bottom:34px">Google</div><div style="border:3px solid #ddd;border-radius:999px;padding:22px 26px;font-size:33px;font-weight:600;color:#111;min-height:92px;text-align:left;white-space:nowrap">🔍 {{TYPE:cardiologo Palermo}}</div></div>', 540, 760, 0.95), in_='up', type_at='scrive', rate=0.12), bg=NIGHT, dark=True), p=0.9),
 
  dict(t="*Primo dettaglio:* il pollice.", v=S(*bignum('1', 'il pollice'), o(E('👍', 820, 360, 150), at='pollice')), p=0.25),
  dict(t="Quel paziente non è al computer. / È sul divano, / col telefono in mano.", v=S(
@@ -98,7 +97,6 @@ SITO = [
         o(tag('comunicazione sanitaria ✓', 540, 920), at='comunicazione'), o(T('siti per tutti', 540, 1080, 60, c='grey'), at='vende', strike='tutti'))),
  dict(t="Se vuoi sapere cosa cambierei nel tuo sito, / commentami *SITO* / e ti scrivo in privato.", v=S(
         o(cta('SITO', 540, 760), in_='up'),
-        o(dict(k='type', s='SITO', x=410, y=800, size=46, wt=800, rate=0.1), in_='none', at='SITO'),
         o(HT('<div class="bubble me">Ciao! Ti scrivo in privato 👋</div>'), y=1040, at='scrivo'))),
 ]
 
@@ -146,8 +144,7 @@ BRAND = [
         o(T('Doctor', 340, 600, 120, font='serif', i=True), in_='left'), o(T('Mike', 760, 600, 120, font='serif', i=True), in_='right'),
         o(chip('cosa fa', 340, 780, bg='green'), at='cosa'), o(chip('chi è', 760, 780, bg='violet'), at='chi'))),
  dict(t="Ora pensa al tuo profilo: / «Dott. Mario Rossi, / medico chirurgo, / specialista in…» / e si perde a metà.", v=S(
-        o(phone('<div style="padding:110px 30px 0"><div style="width:130px;height:130px;border-radius:50%;background:#ddd;margin:0 auto"></div></div>', 540, 760, 0.95), in_='up'),
-        o(dict(k='type', s='Dott. Mario Rossi, medico chirurgo, specialista in…', x=540, y=660, size=34, rate=0.045, w=420, style='white-space:normal;text-align:left'), in_='none', at='Dott'),
+        o(phone('<div style="padding:120px 34px 0;text-align:center"><div style="width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,#CDB8D8,#1E3A2F);margin:0 auto 26px"></div><div style="font-size:34px;font-weight:600;line-height:1.35;text-align:left;min-height:200px">{{TYPE:Dott. Mario Rossi, medico chirurgo, specialista in…}}</div></div>', 540, 760, 0.95), in_='up', type_at='Dott', rate=0.06),
         o(T('…?', 540, 900, 120, c='grey', font='serif', i=True), at='perde'))),
  dict(t="Il brand è quello che i pazienti dicono di te / quando *non* sei nella stanza.", v=S(
         *bubbles(['Vai dalla dottoressa dei nei!', 'Quello che spiega tutto su Instagram?', 'Sì, il cardiologo dei video!'], y0=420, gap=170, ats=['pazienti', 'dicono', 'quando']),
@@ -195,6 +192,5 @@ BRAND = [
         o(chip('dal nome al primo video', 540, 900, bg='violet'), at='nome'), o(tag('✓ codice deontologico', 540, 1060, size=56), at='codice'))),
  dict(t="Se vuoi capire quale potrebbe essere il tuo, / commentami *BRAND* / e ti scrivo in privato.", v=S(
         o(cta('BRAND', 540, 760), in_='up'),
-        o(dict(k='type', s='BRAND', x=420, y=800, size=46, wt=800, rate=0.1), in_='none', at='BRAND'),
         o(HT('<div class="bubble me">Ciao! Ti scrivo in privato 👋</div>'), y=1040, at='scrivo'))),
 ]
