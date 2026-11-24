@@ -59,7 +59,13 @@ def kit(sr):
     # boom: deep impact for big numbers / section titles
     n = int(sr * .8); t = np.arange(n) / sr
     S['boom'] = _norm(np.sin(2 * np.pi * (45 + 80 * np.exp(-t * 12)) * t) * _env(n, .003, .3, sr), .55)
+    # heart: lub-dub heartbeat (single beat; the engine repeats it)
+    n = int(sr * .6); t = np.arange(n) / sr
+    def thump(t0, f, g):
+        tt = np.clip(t - t0, 0, None)
+        return (np.sin(2 * np.pi * f * tt) + .45 * np.sin(2 * np.pi * 2.1 * f * tt)) * np.exp(-tt * 20) * (t >= t0) * g
+    S['heart'] = _norm(thump(0, 78, 1) + thump(.17, 66, .75) + _bp(rng.standard_normal(n), sr, 30, 160) * np.exp(-t * 18) * .3, .9)
     return S
 
 # relative mix levels (voice peaks around 0.9)
-LEVEL = dict(pop=.55, click=.6, key=.5, ding=.55, stamp=.75, whoosh=.7, swipe=.6, riser=.55, sparkle=.55, step=.5, boom=.7)
+LEVEL = dict(pop=.55, click=.6, key=.5, ding=.55, stamp=.75, whoosh=.7, swipe=.6, riser=.55, sparkle=.55, step=.5, boom=.7, heart=.95)

@@ -417,6 +417,13 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
     if 'shake' in it:
         st = t + float(it['shake'])
         doc.js.append(f'tl.to("#{eid}",{{rotation:9,duration:0.06,yoyo:true,repeat:11,ease:"none"}},{st:.3f});')
+    def _tat(at):
+        at = _wi(at, words) if isinstance(at, str) else at
+        return tl_words[min(at, len(tl_words) - 1)][0] if isinstance(at, int) else t + float(at)
+    for at, js in it.get('fx', []):
+        doc.js.append(js.replace('#ID', '#' + eid).replace('@T', f'{_tat(at):.3f}').replace('@END', f'{scene_end:.3f}'))
+    for at, kind in it.get('sfxs', []):
+        doc.sfx.append((kind, _tat(at)))
     for sg in it.get('stg', []):
         st = tl_words[sg['at']][0] if isinstance(sg.get('at'), int) else t + float(sg.get('dt', 0))
         doc.js.append(f'tl.fromTo("#{eid} {sg["sel"]}",{json.dumps(sg.get("frm",{"opacity":0,"scale":0.3}))},'
@@ -492,12 +499,16 @@ def build_html(name, tl, total):
         if not v.get('nocap'):
             cy = v.get('capy', CAP_Y)
             ws = [(w, e, a, z2) for b in sc['beats'] for (w, e), (a, z2) in zip(b['words'], b['wt'])]
+            dark_t = None
+            if v.get('dark_from'):
+                aw = [w for b in sc['beats'] for w in b['words']]
+                dark_t = ws[_wi(v['dark_from'], aw)][2] - 0.05
             for i, (w, e, a, z2) in enumerate(ws):
                 nxt = ws[i + 1][2] if i + 1 < len(ws) else min(end, z2 + 0.5)
                 d = min(nxt, z2 + 0.6) - a
                 if d < 0.04: continue
                 cid = doc.id('c')
-                cl = 'cap' + (' dark' if dark else '') + (' em' if e else '')
+                cl = 'cap' + (' dark' if dark or (dark_t is not None and a >= dark_t) else '') + (' em' if e else '')
                 doc.html.append(f'<div id="{cid}" class="clip {cl}" data-start="{a:.3f}" data-duration="{d:.3f}" data-track-index="3" style="top:{cy}px"><span>{esc(w)}</span></div>')
                 doc.js.append(f'gsap.set("#{cid}",{{yPercent:-50,z:220}});')
                 doc.js.append(f'tl.fromTo("#{cid}",{{scale:0.7,rotationX:-55,y:30}},{{scale:1,rotationX:0,y:0,duration:0.16,ease:"back.out(2)"}},{a:.3f});')

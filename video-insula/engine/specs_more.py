@@ -9,6 +9,8 @@ def S(*items, **kw):
 
 BLANK = dict(items=[], capy=900)
 NIGHT = '#0E1626'
+from sito_fx import desk_new, desk_old, macbook, glow, arrow, time_picker, darkness, spotlight, worried_guy, google_scroll, booking, confetti
+HB = 'tl.to("#ID",{keyframes:[{scale:1.28,duration:.07},{scale:1,duration:.1},{scale:1.16,duration:.07},{scale:1,duration:.3}]},@T);'
 
 def notif(txt, sub, y, **k):
     return HT(f'<div style="width:840px;background:rgba(255,255,255,.96);border-radius:34px;padding:26px 30px;display:flex;gap:24px;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.18);font-family:Inter;text-align:left;white-space:normal"><div style="width:84px;height:84px;border-radius:20px;background:#1E3A2F;color:#F4EEE3;display:flex;align-items:center;justify-content:center;font-size:44px;font-family:Noto Color Emoji">📅</div><div><div style="font-weight:800;font-size:32px">{txt}</div><div style="font-size:28px;color:#666">{sub}</div></div></div>', 540, y, **k)
@@ -17,12 +19,15 @@ def page_card(title, y, **k):
     return HT(f'<div style="width:820px;background:#fff;border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,.12);padding:30px 36px;font-family:Inter;text-align:left;white-space:normal;border-left:14px solid #5B3A66"><div style="font-size:24px;color:#2a7f3f">dottbianchi.it › approfondimenti</div><div style="font-size:40px;font-weight:800;color:#1a0dab;margin-top:6px">{title}</div></div>', 540, y, **k)
 
 SITO = [
- dict(t="Questo è il sito di un cardiologo.", v=S(o(site_new(540, 760, style='transform:scale(.85)'), in_='left'), o(chip('cardiologo', 540, 1230), at='cardiologo'))),
- dict(t="E anche questo è il sito di un cardiologo.", v=S(o(site_new(300, 760, style='transform:scale(.5)'), in_='none'),
-        o(site_old(790, 760, style='transform:scale(.5)'), in_='right'), o(chip('cardiologo', 300, 1080, size=38), in_='none'), o(chip('cardiologo', 790, 1080, size=38), at='cardiologo'))),
- dict(t="Stesso curriculum, / stessa città, / stesso prezzo della visita.", v=S(
-        o(T('📄  stesso curriculum', 540, 520, 62), at=0), o(T('📍  stessa città', 540, 700, 62), at=2), o(T('💶  stesso prezzo', 540, 880, 62), at=4),
-        o(HT('<div class="dbox" style="width:860px;height:560px;border-color:#5B3A66"></div>', 540, 700), in_='fade', at=4))),
+dict(t="Questo è il sito di un cardiologo.", v=S(
+        o(glow(540, 470, 980, 760), in_='fade', at=0),
+        o(macbook(desk_new(), 540, 470, 780), in_='down', at=0),
+        o(glow(540, 1010, 980, 760), in_='fade', beat=1, at=1),
+        o(macbook(desk_old(), 540, 1010, 780), in_='up', beat=1, at=0), capy=1580)),
+dict(t="E anche questo è il sito di un cardiologo."),
+dict(t="Stesso curriculum, / stessa città, / stesso prezzo della visita.", v=S(
+        o(T('📄  stesso curriculum', 560, 480, 64), at=0), arrow(250, 530, 250, 750, 'stessa', bend=-150), o(T('📍  stessa città', 560, 780, 64), at='città'),
+        arrow(250, 830, 250, 1050, 'stesso', bend=-150), o(T('💶  stesso prezzo', 560, 1080, 64), at='prezzo'), capy=1500)),
  dict(t="Ma uno riceve prenotazioni *anche di notte*,", v=S(
         o(T('🌙', 880, 330, 120), in_='pop'),
         o(notif('Nuova prenotazione', 'Visita cardiologica · alle 23:14', 500), in_='down', at='prenotazioni'),
@@ -35,27 +40,28 @@ SITO = [
         o(E('🖼️', 300, 760, 220), at='vetrina'), o(chip('sito vetrina', 300, 960, bg='#9A9A9A'), at='vetrina'),
         o(E('⚙️', 780, 760, 220), at='lavora', in_='spin'), o(chip('sito che lavora', 780, 960, bg='green'), at='lavora'))),
  dict(t="Immagina un paziente.", v=S(o(E('🛋️', 540, 820, 380), in_='up'), o(E('🧑', 540, 640, 220), in_='pop', dt=0.3), o(T('🌙', 860, 330, 120), in_='fade'), bg=NIGHT, dark=True)),
- dict(t="Sono le undici di sera, / sente il cuore che batte strano.", v=S(
-        o(T('23:00', 540, 520, 220, c='#F4EEE3'), in_='zoom'),
-        o(E('❤️', 540, 860, 240), at='cuore', shake=0.2), bg=NIGHT, dark=True)),
+dict(t="Sono le undici di sera, / sente il cuore che batte strano.", v=S(
+        o(time_picker(540, 520, 0.1), in_='zoom'),
+        o(E('❤️', 540, 1010, 250), at='cuore', idle=False, fx=[(0.0, HB), (0.8, HB), (1.55, HB)], sfxs=[(0.0, 'heart'), (0.8, 'heart'), (1.55, 'heart')]),
+        bg=NIGHT, dark=True)),
  dict(t="Prende il telefono / e scrive: «cardiologo Palermo».", v=S(
         o(phone('<div style="padding:150px 26px 0"><div style="font-size:56px;font-weight:800;text-align:center;margin-bottom:34px">Google</div><div style="border:3px solid #ddd;border-radius:999px;padding:22px 26px;font-size:33px;font-weight:600;color:#111;min-height:92px;text-align:left;white-space:nowrap">🔍 {{TYPE:cardiologo Palermo}}</div></div>', 540, 760, 0.95), in_='up', type_at='scrive', rate=0.12), bg=NIGHT, dark=True), p=0.9),
 
  dict(t="*Primo dettaglio:* il pollice.", v=S(*bignum('1', 'il pollice'), o(E('👍', 820, 360, 150), at='pollice')), p=0.25),
- dict(t="Quel paziente non è al computer. / È sul divano, / col telefono in mano.", v=S(
-        o(E('💻', 540, 520, 230), in_='pop', out='divano'), o(T('✕', 540, 520, 300, c='red'), at='computer', out='divano'),
-        o(E('🛋️', 380, 820, 260), at='divano'), o(E('📱', 720, 800, 240), at='telefono'))),
+dict(t="Quel paziente non è al computer. / È sul divano, / col telefono in mano.", v=S(
+        o(E('💻', 540, 560, 260), in_='pop', out='divano'), o(T('✕', 540, 560, 320, c='red'), at='computer', out='divano'),
+        darkness('divano'), spotlight(540, 'divano'), *worried_guy(540, 860, 'divano'), dark_from='divano')),
  dict(t="Il sito del primo si apre in un attimo / e si legge con un dito.", v=S(
         o(site_new(540, 760, style='transform:scale(.85)'), in_='up'), o(tag('⚡ 0,8 secondi', 800, 340), at='attimo'), o(E('👆', 760, 1080, 170), at='dito'))),
  dict(t="Quello del secondo è stato fatto nel 2014: / testo minuscolo, / foto che non caricano, / un menu che non si apre.", v=S(
         o(site_old(540, 760, style='transform:scale(.85)'), in_='up'), o(chip('2014', 830, 330, bg='#9A9A9A'), at='2014'),
         o(tag('testo minuscolo', 300, 560, bg='#FFD2D6', c='#9a0f1c'), at='testo'), o(tag('foto ✕', 790, 720, bg='#FFD2D6', c='#9a0f1c'), at='foto'),
         o(tag('menu ✕', 300, 980, bg='#FFD2D6', c='#9a0f1c'), at='menu'))),
- dict(t="Secondo Google, / se una pagina da mobile ci mette più di tre secondi, / più della metà delle persone *se ne va*.", v=S(
-        o(HT('<div style="width:220px;height:220px;border-radius:50%;border:18px solid #eee;border-top-color:#2747F5"></div>', 540, 520), in_='spin'),
-        counter(3, 540, 520, 80, suf=' s', c='blue', at='tre', dur=1.0),
-        counter(53, 540, 870, 230, suf='%', c='red', at='metà', dur=0.9),
-        o(T('abbandona la pagina', 540, 1060, 48), at='va'), o(T('Fonte: Google / Think with Google', 540, 1160, 26, c='grey'), in_='fade', at='metà'))),
+dict(t="Secondo Google, / se una pagina da mobile ci mette più di tre secondi, / più della metà delle persone *se ne va*.", v=S(
+        *google_scroll(540, 790, 0, 'pagina'),
+        o(HT('<div style="width:660px;height:300px;border-radius:40px;background:rgba(255,255,255,.95);box-shadow:0 30px 80px rgba(0,0,0,.25)"></div>', 540, 1120), at='metà'),
+        counter(53, 540, 1080, 150, suf='%', c='red', at='metà', dur=0.8), o(T('se ne va', 540, 1185, 44), at='va'),
+        o(T('Fonte: Google / Think with Google', 540, 1300, 24, c='grey'), in_='fade', at='metà'))),
  dict(t="Il paziente torna indietro. / E clicca sul prossimo.", v=S(
         o(serp('cardiologo Palermo', [('Dott. M. Bianchi – Cardiologo', '★★★★★', '4,9 · aperto', '#1E3A2F'), ('Dott. Neri – Cardiologia', '★★★☆☆', '3 recensioni', '#bbb'), ('Centro Cuore', '★★★★☆', '4,2', '#CDB8D8')], 540, 760), in_='up'),
         o(E('👆', 800, 700, 140), at='clicca'), o(HT('<div class="dbox" style="width:880px;height:150px;border-color:#2747F5"></div>', 540, 640), at='prossimo'))),
@@ -70,9 +76,9 @@ SITO = [
  dict(t="Sul sito del secondo c'è scritto: / «telefonare dal lunedì al venerdì, / dalle nove alle dodici».", v=S(
         o(HT('<div style="width:820px;background:#f3f0e6;border:3px solid #bbb;padding:44px;font-family:Times New Roman,serif;font-size:50px;text-align:center;white-space:normal;color:#222">Per appuntamenti telefonare<br>dal <b>lunedì</b> al <b>venerdì</b><br>dalle <b>9:00</b> alle <b>12:00</b></div>', 540, 680), in_='up'),
         o(E('☎️', 540, 1050, 180), at='telefonare'))),
- dict(t="Alle undici di sera, / il paziente sceglie chi gli permette di prenotare *adesso*.", v=S(
-        o(T('23:00', 540, 460, 180, c='#F4EEE3'), in_='zoom'), o(HT('<div class="btn" style="background:#F4EEE3;color:#1E3A2F">Prenota adesso</div>', 540, 820), at='prenotare'),
-        o(E('👆', 700, 980, 160), at='adesso'), bg=NIGHT, dark=True)),
+dict(t="Alle undici di sera, / il paziente sceglie chi gli permette di prenotare *adesso*.", v=S(
+        o(chip('🌙 23:00', 540, 300, bg='#2b2f45', size=44), at=0),
+        *booking(540, 840, 'paziente', 'sceglie', 'prenotare', 'adesso', 0.9), bg=NIGHT, dark=True)),
 
  dict(t="*Terzo dettaglio,* / il più sottovalutato: / parlare la lingua di Google.", v=S(*bignum('3', 'la lingua di Google'), o(E('🔍', 820, 360, 150), at='Google')), p=0.25),
  dict(t="Il primo ha una pagina per ogni domanda che i pazienti si fanno davvero: / «Palpitazioni: quando preoccuparsi». / «Holter: come funziona».", v=S(
@@ -90,9 +96,10 @@ SITO = [
  dict(t="Il primo dorme / e il suo sito continua a riempirgli l'agenda.", v=S(o(E('😴', 540, 400, 200), in_='pop'), o(cal(True, 540, 860, title='Dott. Bianchi', style='transform:scale(.8)'), in_='up', at='sito'))),
  dict(t="Il secondo paga un sito / che fa da *biglietto da visita* / in un cassetto.", v=S(
         o(E('🗄️', 540, 840, 380), in_='up'), o(HT('<div style="width:440px;height:250px;background:#fff;border-radius:10px;box-shadow:0 20px 40px rgba(0,0,0,.2);font-family:Times New Roman,serif;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:34px;rotate:-6deg;white-space:normal;text-align:center">Dott. Neri<br><span style="font-size:24px;color:#666">www.dottneri.it</span></div>', 540, 480), at='biglietto'))),
- dict(t="Noi di Insula costruiamo siti per medici / pensati per il telefono, / per la prenotazione / e per Google.", v=S(
-        o(dict(k='img', src='assets/img/insula-logo.webp', x=540, y=520, w=380, h=380, r=190), in_='spin'),
-        o(chip('📱 telefono', 540, 830, bg='green'), at='telefono'), o(chip('📅 prenotazione', 540, 960, bg='violet'), at='prenotazione'), o(chip('🔍 Google', 540, 1090, bg='#B39874'), at='Google'))),
+dict(t="Noi di Insula costruiamo siti per medici / pensati per il telefono, / per la prenotazione / e per Google.", v=S(
+        *confetti(0.2, n=110), o(dict(k='img', src='assets/img/insula-logo.webp', x=540, y=230, w=170, h=170, r=85), in_='spin'),
+        o(macbook(desk_new(long=True), 540, 650, 880, scroll=(0.6, 1300)), in_='zoom', at=0),
+        o(chip('📱 telefono', 220, 1110, bg='green', size=38), at='telefono'), o(chip('📅 prenotazione', 540, 1110, bg='violet', size=38), at='prenotazione'), o(chip('🔍 Google', 870, 1110, bg='#B39874', size=38), at='Google'))),
  dict(t="Testi scritti da chi conosce la comunicazione sanitaria, / non da chi vende siti a tutti.", v=S(o(E('✍️', 540, 620, 280), in_='pop'),
         o(tag('comunicazione sanitaria ✓', 540, 920), at='comunicazione'), o(T('siti per tutti', 540, 1080, 60, c='grey'), at='vende', strike='tutti'))),
  dict(t="Se vuoi sapere cosa cambierei nel tuo sito, / commentami *SITO* / e ti scrivo in privato.", v=S(
