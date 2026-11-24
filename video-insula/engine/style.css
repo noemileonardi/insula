@@ -49,3 +49,11 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:#fff}
 
 .phone .scr,.phone .scr *{white-space:normal}
 .it .tile{white-space:normal}
+
+.punch{position:absolute;inset:0;transform-origin:50% 45%}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;pointer-events:none}
+.b1{width:760px;height:760px;left:-260px;top:160px;background:radial-gradient(circle,#CDB8D8 0%,rgba(205,184,216,0) 70%)}
+.b2{width:820px;height:820px;right:-300px;top:900px;background:radial-gradient(circle,#BFDCCB 0%,rgba(191,220,203,0) 70%)}
+.scene.dark .blob{display:none}
+.clipcard{border-radius:34px;overflow:hidden;border:8px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.28);background:#111;position:relative}
+.clipcard .src{position:absolute;left:18px;top:18px;background:rgba(0,0,0,.55);color:#fff;font:700 24px Inter;padding:8px 16px;border-radius:999px;z-index:2}

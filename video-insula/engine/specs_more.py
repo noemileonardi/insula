@@ -117,6 +117,15 @@ def mag(x=540, y=740, **k):
 <div style="position:absolute;top:150px;right:30px;font-size:30px;font-weight:700">2015</div>
 <div class="serif" style="position:absolute;bottom:40px;left:30px;right:30px;font-size:74px;line-height:.95;font-style:italic">Il dottore più sexy d’America</div></div>''', x, y, **k)
 
+def MCLIP(name, x, y, w, **k):
+    from PIL import Image
+    import subprocess
+    wh = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', f'assets/mike_clips/{name}.mp4'], capture_output=True, text=True).stdout.strip().split(',')
+    h = int(w * int(wh[1]) / int(wh[0]))
+    d = dict(k='video', src=f'assets/mike_clips/{name}.mp4', x=x, y=y, w=w, h=h, depth=60,
+             style='border-radius:34px;border:8px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.28);background:#111;')
+    d.update(k); return d
+
 def card3(n, label, bg, y, at):
     return o(HT(f'<div class="card" style="width:820px;height:190px;flex-direction:row;gap:30px;background:{bg}"><span class="serif" style="font-size:110px;font-style:italic;color:#E8901C">{n}</span><span style="font-size:52px">{label}</span></div>', 540, y), at=at)
 
@@ -168,10 +177,10 @@ BRAND = [
  dict(t="Smonta i miti / che la gente trova già sui social.", v=S(
         o(T('«Il limone cura tutto»', 540, 360, 60, font='serif', i=True), at='Smonta', strike='miti'), o(T('«Il caffè fa male al cuore»', 540, 500, 60, font='serif', i=True), at='gente', strike='trova'),
         o(T('«Antibiotici per il raffreddore»', 540, 640, 58, font='serif', i=True), at='già', strike='social'),
-        o(dict(k='img', src='assets/img/mike_tile3.jpg', x=540, y=990, w=300, h=400, r=26), at='Smonta', in_='up'))),
+        o(MCLIP('mike_dieta', 540, 1000, 430), at='Smonta', in_='up'), o(chip('@doctor.mike', 400, 700, bg='#111', size=34), at='Smonta'))),
  dict(t="Così sposta l'attenzione / dalla sua faccia / alla sua *competenza*.", v=S(
         o(CUT('mike_scrubs', 280, 720, 520), at='faccia', in_='left'), o(T('→', 540, 720, 140, c='violet'), at='alla'),
-        o(E('🩺', 800, 720, 240), at='competenza'), o(chip('competenza', 800, 950, bg='green'), at='competenza'))),
+        o(MCLIP('mike_chirurgo', 790, 720, 380), at='alla', in_='right'), o(chip('competenza', 790, 1100, bg='green'), at='competenza'))),
  dict(t="Da «il dottore bello» / a «il dottore di cui mi fido».", v=S(
         o(chip('il dottore bello', 540, 560, bg='#9A9A9A', size=56), at=0, strike='a'), o(T('↓', 540, 720, 120, c='violet'), at='a'),
         o(chip('il dottore di cui mi fido', 540, 880, bg='green', size=56), at='fido'))),
@@ -180,9 +189,8 @@ BRAND = [
  dict(t="Il suo canale *non* esplode subito.", v=S(*bars([.08, .1, .13, .15, .2, .24], 540, 1000, 520, 100, 36, colors=['#CDB8D8'] * 6, labels=['', '', '', '', '', '']),
         o(T('lento.', 540, 480, 110, font='serif', i=True, c='grey'), at='esplode'))),
  dict(t="Lui però pubblica due video a settimana. / Sempre.", v=S(
-        o(HT('<div style="display:grid;grid-template-columns:repeat(3,270px);gap:8px">' + ''.join(f'<img class="tl" src="assets/img/mike_tile{i}.jpg" style="width:270px;height:360px;object-fit:cover;border-radius:10px">' for i in range(1, 7)) + '</div>', 540, 690), in_='fade',
-          stg=[dict(sel='.tl', at='due', each=0.12, sfx=True)]),
-        o(tag('2 video a settimana', 540, 1110, size=60), at='settimana'))),
+        o(MCLIP('mike_podcast', 540, 680, 600), in_='zoom'), o(chip('@doctor.mike · The Checkup', 540, 300, bg='#111', size=34), at='pubblica'),
+        o(tag('2 video a settimana', 540, 1150, size=60), at='settimana'))),
  dict(t="E già nel 2017 / assume un montatore, / perché ha capito che da solo / non può fare il medico / e anche la casa di produzione.", v=S(
         o(chip('2017', 540, 380, bg='red', size=60), at='2017'), o(E('🧑‍💻', 330, 700, 240), at='montatore'), o(E('🎬', 760, 700, 240), at='montatore'),
         o(E('🩺', 330, 1000, 160), at='medico'), o(E('🎥', 760, 1000, 160), at='produzione'))),

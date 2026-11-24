@@ -273,7 +273,8 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
         inner = f'<img src="{it["src"]}" style="width:100%;height:100%;object-fit:{it.get("fit","cover")};object-position:{it.get("pos","center")}">'
     elif k == 'video':
         style += 'overflow:hidden;'
-        inner = (f'<video class="clip" src="{it["src"]}" muted playsinline data-start="{it["vstart"]:.3f}" data-duration="{it["vdur"]:.3f}" '
+        vst = it.get('vstart', t); vdu = it.get('vdur', scene_end - t + 0.6)
+        inner = (f'<video class="clip" src="{it["src"]}" muted playsinline data-start="{vst:.3f}" data-duration="{vdu:.3f}" '
                  f'data-track-index="2" style="width:100%;height:100%;object-fit:cover"></video>')
     elif k == 'html':
         inner = emojify(it['html'])
@@ -383,14 +384,14 @@ def build_html(name, tl, total):
         last = si + 1 == len(scenes)
         ve = end if last else end + OV - 0.12
         bg = v.get('bg', '#FFFFFF'); dark = v.get('dark', False)
-        doc.html.append(f'<div id="{sid}" class="clip scene{" dark" if dark else ""}" data-start="{vs:.3f}" data-duration="{ve - vs:.3f}" data-track-index="1" style="background:{bg};z-index:{si + 1}"><div class="cam" id="{sid}cam"><div class="floorwrap"><div class="floor"></div></div>')
+        doc.html.append(f'<div id="{sid}" class="clip scene{" dark" if dark else ""}" data-start="{vs:.3f}" data-duration="{ve - vs:.3f}" data-track-index="1" style="background:{bg};z-index:{si + 1}"><div class="punch" id="{sid}p"><div class="cam" id="{sid}cam"><div class="blob b1" id="{sid}b1"></div><div class="blob b2" id="{sid}b2"></div><div class="floorwrap"><div class="floor"></div></div>')
         frm, to = TR[si % len(TR)]
         if si > 0:
-            doc.js.append(f'tl.fromTo("#{sid}",{frm},{{rotationY:0,rotationX:0,x:0,y:0,z:0,opacity:1,duration:{OV + 0.05},ease:"power3.out"}},{vs:.3f});')
+            doc.js.append(f'tl.fromTo("#{sid}",{frm[:-1]},filter:"blur(14px)"}},{{rotationY:0,rotationX:0,x:0,y:0,z:0,opacity:1,filter:"blur(0px)",duration:{OV + 0.05},ease:"power3.out"}},{vs:.3f});')
             doc.sfx.append(('whoosh', vs - 0.05))
         if not last:
             nfrm, nto = TR[(si + 1) % len(TR)]
-            doc.js.append(f'tl.to("#{sid}",{nto[:-1]},duration:{OV},ease:"power3.in"}},{end - 0.12:.3f});')
+            doc.js.append(f'tl.to("#{sid}",{nto[:-1]},filter:"blur(14px)",duration:{OV},ease:"power3.in"}},{end - 0.12:.3f});')
         # camera: slow 3D orbit + push-in; captions live inside it, so they move with the scene
         sg = 1 if si % 2 == 0 else -1
         z = v.get('cam', 1.08)
@@ -415,7 +416,14 @@ def build_html(name, tl, total):
                 doc.html.append(f'<div id="{cid}" class="clip {cl}" data-start="{a:.3f}" data-duration="{d:.3f}" data-track-index="3" style="top:{cy}px"><span>{esc(w)}</span></div>')
                 doc.js.append(f'gsap.set("#{cid}",{{yPercent:-50,z:220}});')
                 doc.js.append(f'tl.fromTo("#{cid}",{{scale:0.7,rotationX:-55,y:30}},{{scale:1,rotationX:0,y:0,duration:0.16,ease:"back.out(2)"}},{a:.3f});')
-        doc.html.append('</div></div>')
+                # punch-in on emphasised words (first word of each emphasis run)
+                if e and (i == 0 or not ws[i - 1][1]):
+                    doc.js.append(f'tl.fromTo("#{sid}p",{{scale:1}},{{scale:1.045,duration:0.11,yoyo:true,repeat:1,ease:"power2.out"}},{a:.3f});')
+        # living background: soft brand-colour blobs drifting
+        if not dark and not v.get('ai'):
+            doc.js.append(f'tl.fromTo("#{sid}b1",{{x:-120,y:-60,scale:1}},{{x:160,y:120,scale:1.25,duration:{ve - vs:.2f},ease:"sine.inOut"}},{vs:.3f});')
+            doc.js.append(f'tl.fromTo("#{sid}b2",{{x:140,y:80,scale:1.2}},{{x:-150,y:-100,scale:0.95,duration:{ve - vs:.2f},ease:"sine.inOut"}},{vs:.3f});')
+        doc.html.append('</div></div></div>')
     body = '\n'.join(doc.html)
     js = '\n'.join(doc.js)
     page = f'''<!doctype html>
