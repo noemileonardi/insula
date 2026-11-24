@@ -108,24 +108,23 @@ from specs_more import SITO, BRAND
 VIDEOS.update(sito=SITO, brand=BRAND)
 
 # ------------------------------------------------------------------ AI 3D scenes (used when the image exists)
-def _attach(video, prefix, sid, *items, capy=1300):
+def _attach(video, prefix, sid, *items, capy=1330):
     for b in VIDEOS[video]:
         if b['t'].startswith(prefix) and b.get('v') is not None:
             b['v'] = dict(b['v']); b['v']['ai'] = dict(id=sid, items=list(items), capy=capy); return
     raise KeyError(prefix)
 
-_attach('social', "Eppure uno ha l'agenda", 'soc_agenda_piena', o(HT('<div class="stamp" style="background:rgba(255,255,255,.9)">PIENA</div>', 760, 330), in_='stamp', at='piena'))
+_attach('social', "Eppure uno ha l'agenda", 'soc_agenda_piena', o(HT('<div class="stamp" style="background:rgba(255,255,255,.9)">PIENA</div>', 540, 1060), in_='stamp', at='piena'))
 _attach('social', "l'altro aspetta", 'soc_telefono_muto', o(chip('0 chiamate', 760, 330, bg='#9A9A9A'), at='telefono'))
-_attach('social', "Così, quando il paziente", 'soc_ti_conosce', o(HT('<div class="bubble">La seguo su Instagram! 😊</div>'), y=330, at='conosce'))
-_attach('social', "Dopo tre mesi", 'soc_programma_tv', o(HT('<div class="bubble me">È martedì! 🔔 Nuovo video</div>'), y=330, at='aspetta'))
-_attach('social', "L'altro copia i trend", 'soc_ordine', o(HT('<div class="stamp" style="font-size:110px;background:rgba(255,255,255,.9)">−30%</div>', 780, 330), in_='stamp', at='trenta'), o(chip('segnalazione', 300, 330, bg='red'), at='segnalazione'))
+_attach('social', "Così, quando il paziente", 'soc_ti_conosce', o(HT('<div class="bubble">La seguo su Instagram! 😊</div>'), y=1080, at='conosce'))
+_attach('social', "Dopo tre mesi", 'soc_programma_tv', o(HT('<div class="bubble me">È martedì! 🔔 Nuovo video</div>'), y=1080, at='aspetta'))
+_attach('social', "L'altro copia i trend", 'soc_ordine', o(HT('<div class="stamp" style="font-size:110px;background:rgba(255,255,255,.9)">−30%</div>', 780, 1080), in_='stamp', at='trenta'), o(chip('segnalazione', 300, 330, bg='red'), at='segnalazione'))
 _attach('social', "Tu fai il medico", 'soc_insula_team', o(chip('il medico', 300, 330, bg='green'), at='medico'), o(chip('noi: i social', 780, 330, bg='violet'), at='social'))
 _attach('sito', "Immagina un paziente", 'sito_divano_notte')
-_attach('sito', "Sono le undici di sera", 'sito_divano_notte', o(T('23:00', 540, 330, 170, c='#F4EEE3'), in_='zoom'))
-_attach('sito', "Due tocchi", 'sito_prenota_ok', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.92)">FATTO</div>', 540, 330), in_='stamp', at='fissato'))
-_attach('sito', "Sul sito del secondo c'è scritto", 'sito_telefono_attesa', o(HT('<div style="background:#f3f0e6;border:3px solid #bbb;padding:24px 30px;font-family:Times New Roman,serif;font-size:40px;text-align:center;white-space:normal;color:#222;width:700px">Telefonare lun–ven<br><b>9:00 – 12:00</b></div>', 540, 330), in_='down', at='telefonare'))
-_attach('sito', "Il primo dorme", 'sito_dorme', o(chip('3 nuove prenotazioni', 540, 330, bg='green'), at='agenda'))
+_attach('sito', "Sono le undici di sera", 'sito_divano_notte', o(T('23:00', 540, 1060, 170, c='#F4EEE3'), in_='zoom'))
+_attach('sito', "Due tocchi", 'sito_prenota_ok', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.92)">FATTO</div>', 540, 1080), in_='stamp', at='fissato'))
+_attach('sito', "Sul sito del secondo c'è scritto", 'sito_telefono_attesa', o(HT('<div style="background:#f3f0e6;border:3px solid #bbb;padding:24px 30px;font-family:Times New Roman,serif;font-size:40px;text-align:center;white-space:normal;color:#222;width:700px">Telefonare lun–ven<br><b>9:00 – 12:00</b></div>', 540, 1080), in_='down', at='telefonare'))
 _attach('sito', "Il secondo paga un sito", 'sito_cassetto', o(chip('biglietto da visita', 540, 330, bg='#9A9A9A'), at='biglietto'))
 _attach('brand', "E già nel 2017", 'brand_montatore', o(chip('2017', 540, 330, bg='red', size=60), at='2017'))
-_attach('brand', "Il brand è quello", 'brand_pazienti_parlano', o(HT('<div class="bubble">Vai dalla dottoressa dei nei!</div>'), y=330, at='dicono'))
-_attach('brand', "E intanto", 'brand_visita', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.9)">CREDIBILE</div>', 540, 330), in_='stamp', at='credibile'))
+_attach('brand', "Il brand è quello", 'brand_pazienti_parlano', o(HT('<div class="bubble">Vai dalla dottoressa dei nei!</div>'), y=1080, at='dicono'))
+_attach('brand', "E intanto", 'brand_visita', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.9)">CREDIBILE</div>', 540, 1080), in_='stamp', at='credibile'))
