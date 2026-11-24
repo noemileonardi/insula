@@ -32,19 +32,57 @@ def read_audio(path):
     raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', path, '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'], capture_output=True, check=True).stdout
     return np.frombuffer(raw, dtype=np.float32).copy()
 
+def compress_silence(a, max_gap=0.20, keep=0.085, rel_db=-32):
+    """Shorten every pause longer than max_gap to `keep` seconds (podcast-tight edit).
+    Returns (new_audio, src_times, dst_times) for remapping timestamps with np.interp."""
+    hop = int(SR * 0.01)
+    n = len(a) // hop
+    if n < 10: return a, np.array([0, len(a) / SR]), np.array([0, len(a) / SR])
+    rms = np.sqrt(np.mean(a[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
+    thr = np.percentile(rms, 95) * 10 ** (rel_db / 20)
+    sil = rms < thr
+    out, src, dst = [], [0.0], [0.0]
+    i, pos, cur = 0, 0, 0
+    fade = int(SR * 0.008)
+    while i < n:
+        if sil[i]:
+            j = i
+            while j < n and sil[j]: j += 1
+            if (j - i) * 0.01 > max_gap:
+                a0, a1 = i * hop, j * hop
+                k = int(keep * SR / 2)
+                seg = a[pos:a0 + k].copy()
+                if out and len(seg) > fade: seg[:fade] *= np.linspace(0, 1, fade)
+                if len(seg) > fade: seg[-fade:] *= np.linspace(1, 0, fade)
+                out.append(seg); cur += len(seg)
+                src.append((a0 + k) / SR); dst.append(cur / SR)
+                pos = a1 - k
+                src.append(pos / SR); dst.append(cur / SR)
+            i = j
+        else:
+            i += 1
+    seg = a[pos:].copy()
+    if out and len(seg) > fade: seg[:fade] *= np.linspace(0, 1, fade)
+    out.append(seg); cur += len(seg)
+    src.append(len(a) / SR); dst.append(cur / SR)
+    return np.concatenate(out).astype(np.float32), np.array(src), np.array(dst)
+
 # podcast-style chain: rumble cut, gentle denoise, warmth/presence EQ, de-ess, 2-stage compression, loudness -16 LUFS
 MASTER = ('highpass=f=75,lowpass=f=16000,afftdn=nf=-28:tn=1,'
           'equalizer=f=180:t=q:w=1.2:g=1.5,equalizer=f=350:t=q:w=1.5:g=-2,equalizer=f=3200:t=q:w=1.2:g=2.5,equalizer=f=11000:t=h:w=0.7:g=1.5,'
           'deesser=i=0.35,acompressor=threshold=-21dB:ratio=3:attack=4:release=90:makeup=3,'
           'acompressor=threshold=-12dB:ratio=6:attack=1:release=40,alimiter=limit=0.89,loudnorm=I=-16:TP=-1.5:LRA=8')
 
-def master(audio):
+MASTER_LIGHT = ('highpass=f=70,equalizer=f=200:t=q:w=1.2:g=1,equalizer=f=3000:t=q:w=1.2:g=1.5,deesser=i=0.3,'
+                'acompressor=threshold=-20dB:ratio=2.5:attack=5:release=100:makeup=2,acompressor=threshold=-10dB:ratio=5:attack=1:release=40,alimiter=limit=0.89')
+
+def master(audio, chain=None):
     import tempfile
     with tempfile.TemporaryDirectory() as d:
         a, b = os.path.join(d, 'a.wav'), os.path.join(d, 'b.wav')
         with wave.open(a, 'wb') as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(audio, -1, 1) * 32767).astype(np.int16).tobytes())
-        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', a, '-af', MASTER, '-ar', str(SR), b], check=True)
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', a, '-af', chain or MASTER, '-ar', str(SR), b], check=True)
         # second pass: exact -16 LUFS integrated loudness, true-peak safe
         r = subprocess.run(['ffmpeg', '-i', b, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
         I = float(re.findall(r'I:\s+(-?[\d.]+) LUFS', r)[-1])
@@ -110,11 +148,11 @@ def build_timeline(beats, voice_path=None):
         chunks, t = [], 0.35
         chunks.append(np.zeros(int(SR * 0.35), np.float32))
         for b in beats:
-            a = tts(clean(b['t']), b.get('speed', 0.9))
+            a = compress_silence(tts(clean(b['t']), b.get('speed', 0.9)), max_gap=0.16, keep=0.07)[0]
             d = len(a) / SR
             ws = words_of(b['t'])
             tl.append(dict(beat=b, start=t, end=t + d, words=ws, wt=word_times(ws, t, d)))
-            pause = b.get('p', 0.12)
+            pause = min(b.get('p', 0.12), 0.16) * 0.75
             chunks += [a, np.zeros(int(SR * pause), np.float32)]
             t += d + pause
         audio = np.concatenate(chunks)
@@ -162,7 +200,13 @@ def align_real_voice(beats, path):
         idx = [k for k, x in enumerate(sw) if x[1] == bi]
         wt = [list(times[k]) for k in idx]
         tl.append(dict(beat=b, start=wt[0][0], end=wt[-1][1], words=ws, wt=wt))
-    return read_audio(path), tl
+    alt = sys.argv[sys.argv.index('--voice-audio') + 1] if '--voice-audio' in sys.argv else path
+    audio, s_src, s_dst = compress_silence(read_audio(alt))
+    remap = lambda x: float(np.interp(x, s_src, s_dst))
+    for b in tl:
+        b['wt'] = [[remap(a0), remap(a1)] for a0, a1 in b['wt']]
+        b['start'], b['end'] = b['wt'][0][0], b['wt'][-1][1]
+    return audio, tl
 
 # ---------------------------------------------------------------- 3D icons
 ICON_SRC = '/tmp/claude-0/-home-user-insula/d5eedac9-3835-54e3-916a-789adeb7f8d4/scratchpad/icons/lobehub-fluent-emoji-3d-1.1.0/package/assets'
@@ -515,8 +559,10 @@ def main():
         json.dump([clean(b['t']) for b in beats], open(os.path.join(CACHE, f'{name}_beats.json'), 'w'), ensure_ascii=False, indent=1)
         print('dumped', len(beats)); return
     tl, audio = build_timeline(beats, voice)
-    if '--no-master' not in sys.argv:
-        audio = master(audio)
+    if '--novoice' in sys.argv:
+        audio = np.zeros_like(audio)
+    elif '--no-master' not in sys.argv:
+        audio = master(audio, MASTER_LIGHT if '--light' in sys.argv else None)
     total = max(len(audio) / SR, tl[-1]['end'] + specs.TAIL.get(name, 2.5))
     audio = np.concatenate([audio, np.zeros(int(total * SR) - len(audio) + 10, np.float32)])
     page, sfx = build_html(name, tl, total)
