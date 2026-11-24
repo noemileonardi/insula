@@ -14,9 +14,9 @@ TAIL = {'social': 2.2, 'sito': 2.2, 'brand': 2.2}
 
 # =====================================================================================
 SOCIAL = [
- dict(t="Questo è un dermatologo.", v=S(o(E(DOC_A, 540, 700, 380), in_='left', float=True), o(chip('dermatologo', 540, 960), at=3))),
+ dict(t="Questo è un dermatologo.", v=S(o(E(DOC_A, 540, 700, 380), in_='walkl'), o(chip('dermatologo', 540, 960), at=3))),
  dict(t="E anche questo è un dermatologo.", v=S(o(E(DOC_A, 300, 700, 300), in_='none'), o(chip('dermatologo', 300, 920, size=38), in_='none'),
-        o(E(DOC_B, 790, 700, 300), in_='right'), o(chip('dermatologo', 790, 920, size=38), at=4))),
+        o(E(DOC_B, 790, 700, 300), in_='walkr'), o(chip('dermatologo', 790, 920, size=38), at=4))),
  dict(t="Stessa laurea, / stessa specializzazione, / stessa città.", v=S(
         o(T('🎓  stessa laurea', 540, 520, 62), at=0), o(T('🩺  stessa specializzazione', 540, 700, 62), at=2), o(T('📍  stessa città', 540, 880, 62), at=4),
         o(HT('<div class="dbox" style="width:900px;height:560px;border-color:#5B3A66"></div>', 540, 700), in_='fade', at=4))),
@@ -24,7 +24,7 @@ SOCIAL = [
         o(HT('<div class="stamp" style="background:rgba(255,255,255,.85)">PIENA</div>', 640, 1020), in_='stamp', at=4))),
  dict(t="l'altro aspetta che squilli il telefono.", v=S(o(cal(False, 540, 640, title='Dott. B'), in_='fade'),
         o(E('☎️', 540, 1050, 240), in_='pop', at=3, shake=0.4)), p=0.3),
- dict(t="E non è perché uno è più bravo dell'altro.", v=S(o(E(DOC_A, 280, 720, 260), in_='left'), o(E(DOC_B, 800, 720, 260), in_='right'),
+ dict(t="E non è perché uno è più bravo dell'altro.", v=S(o(E(DOC_A, 280, 720, 260), in_='walkl'), o(E(DOC_B, 800, 720, 260), in_='walkr'),
         o(T('=', 540, 700, 200), at=4, c='violet'))),
  dict(t="Il motivo sono *tre cose* che il primo fa sui social", v=S(o(E('📱', 540, 760, 360), in_='zoom', float=True),
         o(T('1', 330, 470, 150, font='serif', i=True, c='orange'), at=3), o(T('2', 540, 380, 150, font='serif', i=True, c='orange'), at=4),
@@ -48,7 +48,7 @@ SOCIAL = [
         o(phone('<div style="position:absolute;inset:0;background:linear-gradient(180deg,#F1ECF4,#CDB8D8);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center"><div style="font-size:150px;font-family:Noto Color Emoji">☀️</div><div class="serif" style="font-size:66px;font-style:italic;line-height:1;margin-top:30px;color:#3d2347">Il sole fa bene ai brufoli?</div><div style="margin-top:40px;font-size:26px;font-weight:700;color:#5B3A66">VERO O FALSO</div></div>', 330, 760, 0.74), in_='left'),
         o(phone('<div style="position:absolute;inset:0;background:linear-gradient(180deg,#1E3A2F,#0f2119);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center"><div style="font-size:150px;font-family:Noto Color Emoji">🔍</div><div class="serif" style="font-size:66px;font-style:italic;line-height:1;margin-top:30px;color:#F4EEE3">Ogni quanto controllo un neo?</div><div style="margin-top:40px;font-size:26px;font-weight:700;color:#C9D2C9">1 MINUTO</div></div>', 750, 760, 0.74), in_='right', at=7))),
  dict(t="Così, quando il paziente entra nello studio, / lo conosce *già*.", v=S(o(E('🚪', 400, 700, 330), in_='pop'),
-        o(E('🙋', 720, 740, 240), in_='right', at=4),
+        o(E('🙋', 720, 740, 240), in_='walkr', at=4),
         o(HT('<div class="bubble">La seguo su Instagram! 😊</div>'), y=380, at=9))),
  dict(t="E si fida.", v=S(o(E('🤝', 540, 700, 360), in_='pop'), o(HT('<div class="stamp ok">FIDUCIA</div>', 540, 1010), in_='stamp', dt=0.3)), p=0.3),
  dict(t="L'altro invece pubblica gli auguri di Natale / e la foto della sala d'attesa.", v=S(
@@ -114,17 +114,3 @@ def _attach(video, prefix, sid, *items, capy=1330):
             b['v'] = dict(b['v']); b['v']['ai'] = dict(id=sid, items=list(items), capy=capy); return
     raise KeyError(prefix)
 
-_attach('social', "Eppure uno ha l'agenda", 'soc_agenda_piena', o(HT('<div class="stamp" style="background:rgba(255,255,255,.9)">PIENA</div>', 540, 1060), in_='stamp', at='piena'))
-_attach('social', "l'altro aspetta", 'soc_telefono_muto', o(chip('0 chiamate', 760, 330, bg='#9A9A9A'), at='telefono'))
-_attach('social', "Così, quando il paziente", 'soc_ti_conosce', o(HT('<div class="bubble">La seguo su Instagram! 😊</div>'), y=1080, at='conosce'))
-_attach('social', "Dopo tre mesi", 'soc_programma_tv', o(HT('<div class="bubble me">È martedì! 🔔 Nuovo video</div>'), y=1080, at='aspetta'))
-_attach('social', "L'altro copia i trend", 'soc_ordine', o(HT('<div class="stamp" style="font-size:110px;background:rgba(255,255,255,.9)">−30%</div>', 780, 1080), in_='stamp', at='trenta'), o(chip('segnalazione', 300, 330, bg='red'), at='segnalazione'))
-_attach('social', "Tu fai il medico", 'soc_insula_team', o(chip('il medico', 300, 330, bg='green'), at='medico'), o(chip('noi: i social', 780, 330, bg='violet'), at='social'))
-_attach('sito', "Immagina un paziente", 'sito_divano_notte')
-_attach('sito', "Sono le undici di sera", 'sito_divano_notte', o(T('23:00', 540, 1060, 170, c='#F4EEE3'), in_='zoom'))
-_attach('sito', "Due tocchi", 'sito_prenota_ok', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.92)">FATTO</div>', 540, 1080), in_='stamp', at='fissato'))
-_attach('sito', "Sul sito del secondo c'è scritto", 'sito_telefono_attesa', o(HT('<div style="background:#f3f0e6;border:3px solid #bbb;padding:24px 30px;font-family:Times New Roman,serif;font-size:40px;text-align:center;white-space:normal;color:#222;width:700px">Telefonare lun–ven<br><b>9:00 – 12:00</b></div>', 540, 1080), in_='down', at='telefonare'))
-_attach('sito', "Il secondo paga un sito", 'sito_cassetto', o(chip('biglietto da visita', 540, 330, bg='#9A9A9A'), at='biglietto'))
-_attach('brand', "E già nel 2017", 'brand_montatore', o(chip('2017', 540, 330, bg='red', size=60), at='2017'))
-_attach('brand', "Il brand è quello", 'brand_pazienti_parlano', o(HT('<div class="bubble">Vai dalla dottoressa dei nei!</div>'), y=1080, at='dicono'))
-_attach('brand', "E intanto", 'brand_visita', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.9)">CREDIBILE</div>', 540, 1080), in_='stamp', at='credibile'))

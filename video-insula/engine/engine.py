@@ -195,6 +195,13 @@ def anim(doc, eid, kind, t, extra=None):
         F('{x:-1100,rotationY:-80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('whoosh', t))
     elif kind == 'right':
         F('{x:1100,rotationY:80,z:-300}', '{x:0,rotationY:0,z:0}', 0.8, 'power3.out'); doc.sfx.append(('whoosh', t))
+    elif kind in ('walkl', 'walkr'):
+        sg = -1 if kind == 'walkl' else 1
+        doc.js.append(f'tl.fromTo({e},{{x:{sg*900},opacity:1}},{{x:0,duration:1.1,ease:"power1.out"}},{t:.3f});')
+        doc.js.append(f'tl.fromTo({e},{{y:0}},{{y:-34,duration:0.14,yoyo:true,repeat:7,ease:"sine.out"}},{t:.3f});')
+        doc.js.append(f'tl.fromTo({e},{{rotation:{-6*sg}}},{{rotation:{6*sg},duration:0.14,yoyo:true,repeat:7,ease:"sine.inOut"}},{t:.3f});')
+        doc.js.append(f'tl.to({e},{{rotation:0,duration:0.2}},{t + 1.12:.3f});')
+        doc.sfx.append(('whoosh', t))
     elif kind == 'fade':
         F('{opacity:0,z:-150}', '{opacity:1,z:0}', 0.5, 'power2.out')
     elif kind == 'zoom':
@@ -264,6 +271,10 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
     elif k == 'img':
         style += f'border-radius:{it.get("r",28)}px;overflow:hidden;'
         inner = f'<img src="{it["src"]}" style="width:100%;height:100%;object-fit:{it.get("fit","cover")};object-position:{it.get("pos","center")}">'
+    elif k == 'video':
+        style += 'overflow:hidden;'
+        inner = (f'<video class="clip" src="{it["src"]}" muted playsinline data-start="{it["vstart"]:.3f}" data-duration="{it["vdur"]:.3f}" '
+                 f'data-track-index="2" style="width:100%;height:100%;object-fit:cover"></video>')
     elif k == 'html':
         inner = emojify(it['html'])
         if '{{TYPE:' in inner:
@@ -307,8 +318,8 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
     life = max(0.6, scene_end - t - 0.6)
     if it.get('idle', True) and k not in ('type',):
         if k == 'emoji':
-            per = 1.5; n = max(0, int(life / per) - 1)
-            doc.js.append(f'tl.to("#{eid}i",{{y:-22,rotationY:14,duration:{per},yoyo:true,repeat:{n},ease:"sine.inOut"}},{t + 0.6:.3f});')
+            per = 1.1; n = max(0, int(life / per) - 1)
+            doc.js.append(f'tl.to("#{eid}i",{{y:-30,rotationY:22,rotation:4,scaleY:1.03,duration:{per},yoyo:true,repeat:{n},ease:"sine.inOut"}},{t + 0.6:.3f});')
         elif k in ('html', 'img'):
             sgn = 1 if (doc.n % 2) else -1
             doc.js.append(f'tl.fromTo("#{eid}i",{{rotationY:{-15*sgn},rotationX:8}},{{rotationY:{15*sgn},rotationX:-4,duration:{life + 0.6:.2f},ease:"sine.inOut"}},{t:.3f});')
@@ -350,10 +361,11 @@ def build_html(name, tl, total):
         # AI 3D scene available? swap in the full-bleed image version of this scene
         alt = sc['v'].get('ai')
         if alt:
-            for ext in ('png', 'jpg'):
+            for ext in ('mp4', 'png', 'jpg'):
                 p = os.path.join(ROOT, 'assets', 'scenes', f"{alt['id']}.{ext}")
                 if os.path.exists(p):
-                    img = dict(k='img', src=f"assets/scenes/{alt['id']}.{ext}", x=540, y=960, w=1240, h=2204, r=0, depth=-120, idle=False)
+                    img = dict(k='video' if ext == 'mp4' else 'img', src=f"assets/scenes/{alt['id']}.{ext}", x=540, y=960, w=1240, h=2204, r=0, depth=-120, idle=False,
+                               vstart=max(0, sc['start'] - 0.12), vdur=sc['end'] - sc['start'] + 0.6)
                     img['in'] = 'fade'
                     shade = dict(k='html', html='<div style="width:1240px;height:2204px;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.45) 85%)"></div>', x=540, y=960, idle=False, depth=-110)
                     shade['in'] = 'none'
