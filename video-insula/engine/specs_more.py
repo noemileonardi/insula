@@ -123,10 +123,12 @@ def card3(n, label, bg, y, at):
 BRAND = [
  dict(t="Questo è un medico di famiglia del New Jersey.", v=S(o(CUT('mike_scrubs', 540, 700, 860), in_='left'),
         o(chip('medico di famiglia', 540, 1130, bg='green'), at='medico'), o(chip('🇺🇸 New Jersey', 780, 340, bg='blue', size=40), at='Jersey'))),
- dict(t="Ed è anche uno dei medici più seguiti *del pianeta*: / circa quindici milioni di iscritti su YouTube.", v=S(
-        o(E('🌍', 540, 500, 300), in_='spin', at='seguiti'),
-        counter(15, 540, 830, 230, suf=' Mln', c='red', at='quindici', dur=1.3),
-        o(T('iscritti su YouTube', 540, 1010, 54), at='iscritti'), o(T('Fonte: Wikipedia / Social Blade, 2026', 540, 1100, 26, c='grey'), in_='fade', at='YouTube'))),
+ dict(t="Ed è anche uno dei medici più seguiti *del pianeta*:", v=S(
+        o(E('🌍', 540, 640, 380), in_='spin'), o(CUT('mike_ritratto', 540, 1010, 300), at='seguiti'))),
+ dict(t="circa quindici milioni di iscritti su YouTube / e più di cinque milioni di follower su Instagram.", v=S(
+        counter(15, 280, 330, 100, suf=' Mln', c='red', at='quindici', dur=1.2), o(T('YouTube', 280, 420, 40, c='grey'), at='YouTube'),
+        counter(5.6, 800, 330, 100, suf=' Mln', dec=1, c='violet', at='cinque', dur=1.2), o(T('Instagram', 800, 420, 40, c='grey'), at='Instagram'),
+        o(phone('<img src="assets/img/mike_ig_full.jpg" style="position:absolute;top:60px;left:0;width:100%">', 540, 900, 0.62), in_='up', at='follower'))),
  dict(t="Si chiama Mikhail Varshavski. / Ma tu probabilmente lo conosci come *Doctor Mike*.", v=S(
         o(T('Mikhail Varshavski', 540, 440, 76, font='serif', i=True), in_='up', out='Ma'),
         o(yt_channel(MIKE_R, 540, 740), in_='up', at='Ma'))),
@@ -161,11 +163,12 @@ BRAND = [
  dict(t="*Seconda scelta:* parlare di quello che la gente guarda già.", v=S(*bignum('2', 'ciò che guardano già')), p=0.25),
  dict(t="Doctor Mike non parte raccontando se stesso.", v=S(o(E('🤳', 540, 680, 300), in_='pop'), o(T('io, io, io…', 540, 960, 80, font='serif', i=True), at='raccontando', strike='stesso'))),
  dict(t="Reagisce a Grey's Anatomy / e a Dr. House: / «questo in corsia succede davvero?» / «Questo no.»", v=S(
-        o(E('📺', 540, 640, 330), in_='zoom'), o(chip("Grey's Anatomy", 300, 380, bg='#2747F5'), at="Grey's"), o(chip('Dr. House', 790, 400, bg='violet'), at='House'),
+        o(dict(k='img', src='assets/img/mike_tile1.jpg', x=540, y=680, w=480, h=640, r=30), in_='zoom'), o(chip("Grey's Anatomy", 300, 380, bg='#2747F5'), at="Grey's"), o(chip('Dr. House', 790, 400, bg='violet'), at='House'),
         o(HT('<div class="stamp ok">VERO</div>', 300, 980), in_='stamp', at='davvero'), o(HT('<div class="stamp">FALSO</div>', 780, 980), in_='stamp', at='no'))),
  dict(t="Smonta i miti / che la gente trova già sui social.", v=S(
-        o(T('«Il limone cura tutto»', 540, 520, 60, font='serif', i=True), at='Smonta', strike='miti'), o(T('«Il caffè fa male al cuore»', 540, 700, 60, font='serif', i=True), at='gente', strike='trova'),
-        o(T('«Antibiotici per il raffreddore»', 540, 880, 58, font='serif', i=True), at='già', strike='social'))),
+        o(T('«Il limone cura tutto»', 540, 360, 60, font='serif', i=True), at='Smonta', strike='miti'), o(T('«Il caffè fa male al cuore»', 540, 500, 60, font='serif', i=True), at='gente', strike='trova'),
+        o(T('«Antibiotici per il raffreddore»', 540, 640, 58, font='serif', i=True), at='già', strike='social'),
+        o(dict(k='img', src='assets/img/mike_tile3.jpg', x=540, y=990, w=300, h=400, r=26), at='Smonta', in_='up'))),
  dict(t="Così sposta l'attenzione / dalla sua faccia / alla sua *competenza*.", v=S(
         o(CUT('mike_scrubs', 280, 720, 520), at='faccia', in_='left'), o(T('→', 540, 720, 140, c='violet'), at='alla'),
         o(E('🩺', 800, 720, 240), at='competenza'), o(chip('competenza', 800, 950, bg='green'), at='competenza'))),
@@ -177,9 +180,9 @@ BRAND = [
  dict(t="Il suo canale *non* esplode subito.", v=S(*bars([.08, .1, .13, .15, .2, .24], 540, 1000, 520, 100, 36, colors=['#CDB8D8'] * 6, labels=['', '', '', '', '', '']),
         o(T('lento.', 540, 480, 110, font='serif', i=True, c='grey'), at='esplode'))),
  dict(t="Lui però pubblica due video a settimana. / Sempre.", v=S(
-        o(HT('<div style="display:grid;grid-template-columns:repeat(7,90px);gap:12px">' + ''.join(f'<div class="wk" style="height:90px;border-radius:14px;background:{"#D7192B" if d in (1, 4) else "#F2F2F2"};display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px">{"▶" if d in (1, 4) else ""}</div>' for w_ in range(6) for d in range(7)) + '</div>', 540, 720), in_='fade',
-          stg=[dict(sel='.wk', at='due', each=0.03, sfx=True)]),
-        o(tag('2 video a settimana', 540, 1100, size=60), at='settimana'))),
+        o(HT('<div style="display:grid;grid-template-columns:repeat(3,270px);gap:8px">' + ''.join(f'<img class="tl" src="assets/img/mike_tile{i}.jpg" style="width:270px;height:360px;object-fit:cover;border-radius:10px">' for i in range(1, 7)) + '</div>', 540, 690), in_='fade',
+          stg=[dict(sel='.tl', at='due', each=0.12, sfx=True)]),
+        o(tag('2 video a settimana', 540, 1110, size=60), at='settimana'))),
  dict(t="E già nel 2017 / assume un montatore, / perché ha capito che da solo / non può fare il medico / e anche la casa di produzione.", v=S(
         o(chip('2017', 540, 380, bg='red', size=60), at='2017'), o(E('🧑‍💻', 330, 700, 240), at='montatore'), o(E('🎬', 760, 700, 240), at='montatore'),
         o(E('🩺', 330, 1000, 160), at='medico'), o(E('🎥', 760, 1000, 160), at='produzione'))),

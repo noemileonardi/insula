@@ -126,8 +126,6 @@ _attach('sito', "Due tocchi", 'sito_prenota_ok', o(HT('<div class="stamp ok" sty
 _attach('sito', "Sul sito del secondo c'è scritto", 'sito_telefono_attesa', o(HT('<div style="background:#f3f0e6;border:3px solid #bbb;padding:24px 30px;font-family:Times New Roman,serif;font-size:40px;text-align:center;white-space:normal;color:#222;width:700px">Telefonare lun–ven<br><b>9:00 – 12:00</b></div>', 540, 330), in_='down', at='telefonare'))
 _attach('sito', "Il primo dorme", 'sito_dorme', o(chip('3 nuove prenotazioni', 540, 330, bg='green'), at='agenda'))
 _attach('sito', "Il secondo paga un sito", 'sito_cassetto', o(chip('biglietto da visita', 540, 330, bg='#9A9A9A'), at='biglietto'))
-_attach('brand', "Reagisce a Grey", 'brand_reaction', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.9)">VERO</div>', 300, 330), in_='stamp', at='davvero'), o(HT('<div class="stamp" style="background:rgba(255,255,255,.9)">FALSO</div>', 780, 330), in_='stamp', at='no'))
-_attach('brand', "Lui però pubblica", 'brand_set_video', o(tag('2 video a settimana', 540, 330, size=60), at='settimana'))
 _attach('brand', "E già nel 2017", 'brand_montatore', o(chip('2017', 540, 330, bg='red', size=60), at='2017'))
 _attach('brand', "Il brand è quello", 'brand_pazienti_parlano', o(HT('<div class="bubble">Vai dalla dottoressa dei nei!</div>'), y=330, at='dicono'))
 _attach('brand', "E intanto", 'brand_visita', o(HT('<div class="stamp ok" style="background:rgba(255,255,255,.9)">CREDIBILE</div>', 540, 330), in_='stamp', at='credibile'))

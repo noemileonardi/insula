@@ -91,7 +91,7 @@ Se vuoi sapere cosa cambierei nel tuo sito, / commentami **SITO** / e ti scrivo 
 ## VIDEO 3 – BRANDING · "Doctor Mike"
 
 Questo è un medico di famiglia del New Jersey. //
-Ed è anche uno dei medici più seguiti **del pianeta**: / circa quindici milioni di iscritti su YouTube.
+Ed è anche uno dei medici più seguiti **del pianeta**: / circa quindici milioni di iscritti su YouTube / e più di cinque milioni di follower su Instagram.
 Si chiama Mikhail Varshavski. / Ma tu probabilmente lo conosci come **Doctor Mike**. //
 Nel 2015 una rivista americana lo nomina "il dottore più sexy d'America".
 Poteva diventare l'ennesimo bel ragazzo di Instagram / e sparire dopo una stagione.
@@ -131,6 +131,7 @@ Se vuoi capire quale potrebbe essere il tuo, / commentami **BRAND** / e ti scriv
 
 ### Fonti usate per i dati
 - 94,2% degli italiani cerca info mediche online (Sociometrica/FieldCare 2026): https://www.avvenire.it/vita-e-cura/salute-il-942-degli-italiani-chiede-a-google-o-allia_104031
+- Instagram @doctor.mike: 5,6 mln follower (screenshot del profilo, novembre 2026)
 - Doctor Mike, ~15 mln iscritti, "sexiest doctor" People 2015, reazioni a serie mediche e debunking: https://en.wikipedia.org/wiki/Doctor_Mike
 - Due video a settimana, montatore assunto nel 2017, canale non esploso subito: https://www.businessinsider.nl/day-inside-studio-of-youtube-star-doctor-mike-photos-interview-2019-11/
 - Medico di famiglia (Chatham Family Medicine, NJ): https://www.atlantichealth.org/find-a-doctor/mikhail-varshavski-1548680986
