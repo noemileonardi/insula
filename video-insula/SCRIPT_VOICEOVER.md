@@ -13,7 +13,7 @@ Come leggerli:
 
 ## VIDEO 1 – SOCIAL · "Due dermatologi"
 
-Questo è un dermatologo. / E anche questo è un dermatologo.
+Questo è un dermatologo / con quindici anni di carriera. / E anche questo è un dermatologo / con quindici anni di carriera.
 Stessa laurea, / stessa specializzazione, / stessa città.
 Eppure uno ha l'agenda **piena** per i prossimi tre mesi, / l'altro aspetta che squilli il telefono.
 E non è perché uno è più bravo dell'altro. //

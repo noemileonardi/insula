@@ -14,9 +14,11 @@ TAIL = {'social': 2.2, 'sito': 2.2, 'brand': 2.2}
 
 # =====================================================================================
 SOCIAL = [
- dict(t="Questo è un dermatologo.", v=S(o(E(DOC_A, 540, 700, 380), in_='walkl'), o(chip('dermatologo', 540, 960), at=3))),
- dict(t="E anche questo è un dermatologo.", v=S(o(E(DOC_A, 300, 700, 300), in_='none'), o(chip('dermatologo', 300, 920, size=38), in_='none'),
-        o(E(DOC_B, 790, 700, 300), in_='walkr'), o(chip('dermatologo', 790, 920, size=38), at=4))),
+ dict(t="Questo è un dermatologo / con quindici anni di carriera.", v=S(o(E(DOC_A, 540, 700, 380), in_='walkl'), o(chip('dermatologo', 540, 960), at='dermatologo'),
+        o(tag('15 anni di carriera', 540, 1080, size=52), at='quindici'))),
+ dict(t="E anche questo è un dermatologo / con quindici anni di carriera.", v=S(o(E(DOC_A, 300, 700, 300), in_='none'), o(chip('dermatologo', 300, 920, size=38), in_='none'),
+        o(tag('15 anni', 300, 1010, size=40), in_='none'), o(E(DOC_B, 790, 700, 300), in_='walkr'), o(chip('dermatologo', 790, 920, size=38), at='dermatologo'),
+        o(tag('15 anni', 790, 1010, size=40), at='quindici'))),
  dict(t="Stessa laurea, / stessa specializzazione, / stessa città.", v=S(
         o(T('🎓  stessa laurea', 540, 520, 62), at=0), o(T('🩺  stessa specializzazione', 540, 700, 62), at=2), o(T('📍  stessa città', 540, 880, 62), at=4),
         o(HT('<div class="dbox" style="width:900px;height:560px;border-color:#5B3A66"></div>', 540, 700), in_='fade', at=4))),
