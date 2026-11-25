@@ -35,12 +35,12 @@ def hud(n, label, icon, at=0):
 # ------------------------------------------------------------------ comparison board with 3D flip tiles
 def board():
     head = HT(f'''<div style="width:900px;display:flex;justify-content:space-around;font-family:Inter;font-weight:800;font-size:34px;color:#fff">
-<div>Dott. Bianchi</div><div>Dott. Neri</div></div>''', 540, 340)
+<div>Dott. Bianchi</div><div>Dott. Neri</div></div>''', 540, 360)
     items = [o(head, in_='down', at=0), o(E('👩‍⚕️', 315, 200, 120), in_='pop', at=0), o(E('👨‍⚕️', 765, 200, 120), in_='pop', at=0)]
     rows = [
-        ('stesso', 470, '<div style="font-size:70px;line-height:1">📜</div><div style="font-size:30px;font-weight:800;margin-top:8px">Laurea + Specializzazione</div>', 'curriculum'),
-        ('stessa', 740, '<div class="map" style="width:100%;height:150px;border-radius:18px;background:linear-gradient(135deg,#1c2a44,#24365a);position:relative;overflow:hidden"><div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.08) 2px,transparent 2px);background-size:34px 34px"></div><div class="pin" style="position:absolute;left:50%;top:18px;margin-left:-30px;font-size:60px">📍</div></div><div style="font-size:30px;font-weight:800;margin-top:8px">Palermo</div>', 'città'),
-        ('stesso#2', 1010, '<div style="font-size:84px;font-weight:900;color:#39E75F;text-shadow:0 0 20px rgba(57,231,95,.6)">€ <span class="pr">120</span></div><div style="font-size:30px;font-weight:800">la visita</div>', 'prezzo'),
+        ('stesso', 560, '<div style="font-size:70px;line-height:1">📜</div><div style="font-size:30px;font-weight:800;margin-top:8px">Laurea + Specializzazione</div>', 'curriculum'),
+        ('stessa', 800, '<div class="map" style="width:100%;height:150px;border-radius:18px;background:linear-gradient(135deg,#1c2a44,#24365a);position:relative;overflow:hidden"><div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.08) 2px,transparent 2px);background-size:34px 34px"></div><div class="pin" style="position:absolute;left:50%;top:18px;margin-left:-30px;font-size:60px">📍</div></div><div style="font-size:30px;font-weight:800;margin-top:8px">Palermo</div>', 'città'),
+        ('stesso#2', 1040, '<div style="font-size:84px;font-weight:900;color:#39E75F;text-shadow:0 0 20px rgba(57,231,95,.6)">€ <span class="pr">120</span></div><div style="font-size:30px;font-weight:800">la visita</div>', 'prezzo'),
     ]
     for at, y, inner, word in rows:
         for x in (315, 765):
@@ -154,10 +154,10 @@ def fast_phone(x, y, at_load, at_scroll, sticky=False, scale=0.9):
 # ------------------------------------------------------------------ the scenes (beat texts must stay identical: the voice is cached per text)
 SITO2 = [
  dict(t="Questo è il sito di un cardiologo.", v=S(
-        o(glow(540, 760, 1100, 900), in_='fade', at=0, fx=[(0, 'tl.to("#ID",{opacity:.75,scale:1.05,duration:0.9,yoyo:true,repeat:5,ease:"sine.inOut"},@T+0.7);'), ('E', 'tl.to("#ID",{x:1200,duration:0.8,ease:"power3.inOut"},@T);')]),
-        o(macbook(desk_new(), 540, 760, 900), in_='down', at=0, fx=[('E', 'tl.to("#ID",{x:1250,rotationY:35,duration:0.8,ease:"power3.inOut"},@T);')]),
-        o(glow(540, 760, 1100, 900, color='205,184,216'), in_='fade', beat=1, at=1),
-        o(macbook(desk_old(), 540, 760, 900), in_='left', beat=1, at=0), capy=1400)),
+        o(glow(540, 760, 860, 700), in_='fade', at=0, fx=[(0, 'tl.to("#ID",{opacity:.75,scale:1.05,duration:0.9,yoyo:true,repeat:5,ease:"sine.inOut"},@T+0.7);'), ('E', 'tl.to("#ID",{x:1200,duration:0.8,ease:"power3.inOut"},@T);')]),
+        o(macbook(desk_new(), 540, 760, 680), in_='down', at=0, fx=[('E', 'tl.to("#ID",{x:1250,rotationY:35,duration:0.8,ease:"power3.inOut"},@T);')]),
+        o(glow(540, 760, 860, 700, color='205,184,216'), in_='fade', beat=1, at=1),
+        o(macbook(desk_old(), 540, 760, 680), in_='left', beat=1, at=0), capy=1400)),
  dict(t="E anche questo è il sito di un cardiologo."),
  dict(t="Stesso curriculum, / stessa città, / stesso prezzo della visita.", v=S(*board(), capy=1450)),
  dict(t="Ma uno riceve prenotazioni *anche di notte*,", v=S(*lockscreen([1, 'anche', 'notte']))),

@@ -67,7 +67,7 @@ def compress_silence(a, max_gap=0.20, keep=0.085, rel_db=-32):
     src.append(len(a) / SR); dst.append(cur / SR)
     return np.concatenate(out).astype(np.float32), np.array(src), np.array(dst)
 
-def cut_word_gaps(a, spans, max_gap=0.16, keep=0.07, margin=0.045):
+def cut_word_gaps(a, spans, max_gap=0.2, keep=0.07, margin=0.085):
     """Shrink every gap between consecutive words (breaths, noises, pauses) using word timestamps."""
     cuts = []
     spans = sorted(spans)
@@ -343,7 +343,7 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
         t = tl_words[min(wi, len(tl_words) - 1)][0] if isinstance(wi, int) else t0 + float(wi)
     else:
         t = t0 + it.get('dt', 0)
-    x, y = it.get('x', 540), it.get('y', 760)
+    x, y = it.get('x', 540), it.get('y', 760) + getattr(doc, 'shift', 0)
     style = f'left:{x}px;top:{y}px;'
     if 'w' in it: style += f'width:{it["w"]}px;'
     if 'h' in it: style += f'height:{it["h"]}px;'
@@ -475,6 +475,7 @@ def build_html(name, tl, total):
     doc = Doc()
     import specs as _sp
     doc.strong = name in getattr(_sp, 'STRONG3D', set())
+    doc.shift = getattr(_sp, 'SHIFT_Y', {}).get(name, 0)
     # group beats into scenes
     scenes = []
     for i, b in enumerate(tl):
@@ -531,7 +532,7 @@ def build_html(name, tl, total):
                 render_item(doc, it, start, allw, end, [w for b in sc['beats'] for w in b['words']])
         # captions (one word at a time) inside the camera
         if not v.get('nocap'):
-            cy = v.get('capy', CAP_Y)
+            cy = v.get('capy', CAP_Y) + min(getattr(doc, 'shift', 0), 1840 - v.get('capy', CAP_Y))
             ws = [(w, e, a, z2) for b in sc['beats'] for (w, e), (a, z2) in zip(b['words'], b['wt'])]
             dark_t = None
             if v.get('dark_from'):

@@ -122,3 +122,4 @@ from sito2 import SITO2, TRANS as _TR2
 VIDEOS['sito'] = SITO2
 TRANS_BY = {'sito': _TR2}
 STRONG3D = {'sito'}
+SHIFT_Y = {'sito': 80}
