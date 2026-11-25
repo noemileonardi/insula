@@ -67,6 +67,31 @@ def compress_silence(a, max_gap=0.20, keep=0.085, rel_db=-32):
     src.append(len(a) / SR); dst.append(cur / SR)
     return np.concatenate(out).astype(np.float32), np.array(src), np.array(dst)
 
+def cut_word_gaps(a, spans, max_gap=0.16, keep=0.07, margin=0.045):
+    """Shrink every gap between consecutive words (breaths, noises, pauses) using word timestamps."""
+    cuts = []
+    spans = sorted(spans)
+    for (s0, e0), (s1, e1) in zip(spans, spans[1:]):
+        g0, g1 = e0 + margin, s1 - margin
+        if g1 - g0 > max_gap:
+            mid = (g0 + g1) / 2
+            cuts.append((g0 + keep / 2, g1 - keep / 2) if False else (g0, g1))
+    out, src, dst, pos, cur = [], [0.0], [0.0], 0, 0
+    fade = int(SR * 0.012)
+    for g0, g1 in cuts:
+        a0, a1 = int(g0 * SR), int(g1 * SR)
+        seg = a[pos:a0].copy()
+        if out and len(seg) > fade: seg[:fade] *= np.linspace(0, 1, fade)
+        if len(seg) > fade: seg[-fade:] *= np.linspace(1, 0, fade)
+        out += [seg, np.zeros(int(keep * SR), np.float32)]
+        cur += len(seg); src.append(a0 / SR); dst.append(cur / SR)
+        cur += int(keep * SR); src.append(a1 / SR); dst.append(cur / SR)
+        pos = a1
+    seg = a[pos:].copy()
+    if out and len(seg) > fade: seg[:fade] *= np.linspace(0, 1, fade)
+    out.append(seg); cur += len(seg); src.append(len(a) / SR); dst.append(cur / SR)
+    return np.concatenate(out).astype(np.float32), np.array(src), np.array(dst)
+
 # podcast-style chain: rumble cut, gentle denoise, warmth/presence EQ, de-ess, 2-stage compression, loudness -16 LUFS
 MASTER = ('highpass=f=75,lowpass=f=16000,afftdn=nf=-28:tn=1,'
           'equalizer=f=180:t=q:w=1.2:g=1.5,equalizer=f=350:t=q:w=1.5:g=-2,equalizer=f=3200:t=q:w=1.2:g=2.5,equalizer=f=11000:t=h:w=0.7:g=1.5,'
@@ -201,8 +226,14 @@ def align_real_voice(beats, path):
         wt = [list(times[k]) for k in idx]
         tl.append(dict(beat=b, start=wt[0][0], end=wt[-1][1], words=ws, wt=wt))
     alt = sys.argv[sys.argv.index('--voice-audio') + 1] if '--voice-audio' in sys.argv else path
-    audio, s_src, s_dst = compress_silence(read_audio(alt))
-    remap = lambda x: float(np.interp(x, s_src, s_dst))
+    raw = read_audio(alt)
+    if '--cut-words' in sys.argv:
+        spans = [tuple(w) for b in tl for w in b['wt']]
+        raw, c_src, c_dst = cut_word_gaps(raw, spans)
+    else:
+        c_src, c_dst = np.array([0, 1e6]), np.array([0, 1e6])
+    audio, s_src, s_dst = compress_silence(raw)
+    remap = lambda x: float(np.interp(np.interp(x, c_src, c_dst), s_src, s_dst))
     for b in tl:
         b['wt'] = [[remap(a0), remap(a1)] for a0, a1 in b['wt']]
         b['start'], b['end'] = b['wt'][0][0], b['wt'][-1][1]
@@ -295,7 +326,7 @@ def _wi(at, words):
     key, _, occ = at.partition('#'); occ = int(occ or 1)
     norm = lambda x: re.sub(r'[^\wàèéìòù]', '', x.lower())
     for i, (w, e) in enumerate(words):
-        if norm(w) == norm(key):
+        if norm(w) == norm(key) or norm(w.replace('’', "'").split("'")[-1]) == norm(key):
             occ -= 1
             if occ == 0: return i
     raise KeyError(f'word {at!r} not in {[w for w,_ in words]}')
@@ -399,7 +430,8 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
             doc.js.append(f'tl.to("#{eid}i",{{y:-30,rotationY:22,rotation:4,scaleY:1.03,duration:{per},yoyo:true,repeat:{n},ease:"sine.inOut"}},{t + 0.6:.3f});')
         elif k in ('html', 'img'):
             sgn = 1 if (doc.n % 2) else -1
-            doc.js.append(f'tl.fromTo("#{eid}i",{{rotationY:{-15*sgn},rotationX:8}},{{rotationY:{15*sgn},rotationX:-4,duration:{life + 0.6:.2f},ease:"sine.inOut"}},{t:.3f});')
+            ay, ax = (24, 13) if getattr(doc, 'strong', False) else (15, 8)
+            doc.js.append(f'tl.fromTo("#{eid}i",{{rotationY:{-ay*sgn},rotationX:{ax}}},{{rotationY:{ay*sgn},rotationX:{-ax // 2},duration:{life + 0.6:.2f},ease:"sine.inOut"}},{t:.3f});')
         else:
             doc.js.append(f'tl.to("#{eid}i",{{y:-14,duration:{life:.2f},ease:"sine.inOut"}},{t + 0.5:.3f});')
     anim(doc, eid, it.get('in', 'pop'), t)
@@ -441,6 +473,8 @@ CSS = open(os.path.join(ROOT, 'tools', 'style.css')).read() if os.path.exists(os
 
 def build_html(name, tl, total):
     doc = Doc()
+    import specs as _sp
+    doc.strong = name in getattr(_sp, 'STRONG3D', set())
     # group beats into scenes
     scenes = []
     for i, b in enumerate(tl):
@@ -464,7 +498,7 @@ def build_html(name, tl, total):
                     shade['in'] = 'none'
                     sc['v'] = dict(items=[img, shade] + alt.get('items', []), dark=True, bg='#111', capy=alt.get('capy', 1300), cam=1.14)
                     break
-    TR = [('{rotationY:-55,x:760,z:-500,opacity:0}', '{rotationY:55,x:-760,z:-500,opacity:0}'),
+    TR = getattr(_sp, 'TRANS_BY', {}).get(name) or [('{rotationY:-55,x:760,z:-500,opacity:0}', '{rotationY:55,x:-760,z:-500,opacity:0}'),
           ('{rotationX:50,y:-900,z:-400,opacity:0}', '{rotationX:-50,y:900,z:-400,opacity:0}'),
           ('{rotationY:55,x:-760,z:-500,opacity:0}', '{rotationY:-55,x:760,z:-500,opacity:0}'),
           ('{z:-1600,opacity:0,rotationX:20}', '{z:900,opacity:0}')]
@@ -479,7 +513,7 @@ def build_html(name, tl, total):
         doc.html.append(f'<div id="{sid}" class="clip scene{" dark" if dark else ""}" data-start="{vs:.3f}" data-duration="{ve - vs:.3f}" data-track-index="1" style="background:{bg};z-index:{si + 1}"><div class="punch" id="{sid}p"><div class="cam" id="{sid}cam"><div class="blob b1" id="{sid}b1"></div><div class="blob b2" id="{sid}b2"></div><div class="floorwrap"><div class="floor"></div></div>')
         frm, to = TR[si % len(TR)]
         if si > 0:
-            doc.js.append(f'tl.fromTo("#{sid}",{frm[:-1]},filter:"blur(14px)"}},{{rotationY:0,rotationX:0,x:0,y:0,z:0,opacity:1,filter:"blur(0px)",duration:{OV + 0.05},ease:"power3.out"}},{vs:.3f});')
+            doc.js.append(f'tl.fromTo("#{sid}",{frm[:-1]},filter:"blur(14px)"}},{{rotationY:0,rotationX:0,x:0,y:0,z:0,scale:1,opacity:1,filter:"blur(0px)",duration:{OV + 0.05},ease:"power3.out"}},{vs:.3f});')
             doc.sfx.append(('whoosh', vs - 0.05))
         if not last:
             nfrm, nto = TR[(si + 1) % len(TR)]

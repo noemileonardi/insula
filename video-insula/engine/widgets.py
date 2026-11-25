@@ -25,7 +25,7 @@ def bignum(n, label, color='orange'):
             HT(f'<div class="serif" style="font-size:96px;font-style:italic;color:#111">{label}</div>', 540, 1040, **{'in': 'up', 'dt': 0.35})]
 
 def phone(inner, x=540, y=760, sc=1.0, **k):
-    return HT(f'<div class="phone" style="transform:scale({sc})"><div class="scr"><div class="notch"></div>{inner}</div></div>', x, y, **k)
+    return HT(f'<div class="phone" style="transform:perspective(1600px) rotateY(-10deg) rotateX(6deg) scale({sc})"><div class="scr"><div class="notch"></div>{inner}</div></div>', x, y, **k)
 
 def cal(full=True, x=540, y=740, title='Agenda', **k):
     days = ['LUN', 'MAR', 'MER', 'GIO', 'VEN']

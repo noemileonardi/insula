@@ -116,3 +116,9 @@ def _attach(video, prefix, sid, *items, capy=1330):
             b['v'] = dict(b['v']); b['v']['ai'] = dict(id=sid, items=list(items), capy=capy); return
     raise KeyError(prefix)
 
+
+# ---- video 2 v3: own identity (night & screens, 3D UI)
+from sito2 import SITO2, TRANS as _TR2
+VIDEOS['sito'] = SITO2
+TRANS_BY = {'sito': _TR2}
+STRONG3D = {'sito'}
