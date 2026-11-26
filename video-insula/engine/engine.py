@@ -318,6 +318,8 @@ def anim(doc, eid, kind, t, extra=None):
         F('{rotationX:-180,opacity:0}', '{rotationX:0,opacity:1}', 0.7, 'back.out(1.4)'); doc.sfx.append(('pop', t))
     elif kind == 'grow':
         F('{scaleY:0}', '{scaleY:1}', 0.9, 'power2.out')
+    elif kind == 'blur':
+        F('{opacity:0,scale:1.18,filter:"blur(22px)"}', '{opacity:1,scale:1,filter:"blur(0px)"}', 0.7, 'power3.out'); doc.sfx.append(('whoosh', t))
     elif kind == 'growx':
         F('{scaleX:0}', '{scaleX:1}', 0.6, 'power2.out')
 
@@ -471,11 +473,57 @@ def render_item(doc, it, t0, tl_words, scene_end, words=()):
 
 CSS = open(os.path.join(ROOT, 'tools', 'style.css')).read() if os.path.exists(os.path.join(ROOT, 'tools', 'style.css')) else ''
 
+def phrase_caps(doc, sc, v, end, dark):
+    """Reference-reel captions: a short phrase builds word by word (blur-in), key words get a growing highlight box,
+    the whole phrase blurs out when the next one starts."""
+    cy = min(v.get('capy', CAP_Y), 1590); fs = v.get('capsize', 54)
+    cdark = dark or v.get('capdark')
+    chunks, cur = [], []
+    for b in sc['beats']:
+        segs = [len(words_of(s)) for s in b['beat']['t'].split(' / ')]
+        bounds, acc = set(), 0
+        for n in segs[:-1]:
+            acc += n; bounds.add(acc)
+        for j, ((w, e), (a, z2)) in enumerate(zip(b['words'], b['wt'])):
+            if cur and (j in bounds or j == 0 or len(cur) >= v.get('capmax', 5)):
+                chunks.append(cur); cur = []
+            cur.append((w, e, a, z2))
+            if re.search(r'[.:;?!…»]$', w) and len(cur) >= 2:
+                chunks.append(cur); cur = []
+    if cur: chunks.append(cur)
+    for ci, ch in enumerate(chunks):
+        a0 = ch[0][2] - 0.06
+        nxt = chunks[ci + 1][0][2] - 0.06 if ci + 1 < len(chunks) else end
+        e0 = min(nxt, max(ch[-1][3] + 0.9, a0 + 0.8), end + 0.3)
+        cid = doc.id('p'); spans = ''; js = []
+        k = 0
+        while k < len(ch):
+            if ch[k][1]:
+                w, e, a, z2 = ch[k]; wid = f'{cid}w{k}'
+                spans += f'<span class="pw emw" id="{wid}">{esc(w)}</span> '
+                js.append(f'tl.fromTo("#{wid}",{{opacity:0,y:26,filter:"blur(10px)",backgroundSize:"0% 100%"}},{{opacity:1,y:0,filter:"blur(0px)",backgroundSize:"100% 100%",duration:0.3,ease:"power3.out"}},{a - 0.04:.3f});')
+                if k == 0 or not ch[k - 1][1]: doc.sfx.append(('click', a))
+                k += 1
+            else:
+                w, e, a, z2 = ch[k]; wid = f'{cid}w{k}'
+                spans += f'<span class="pw" id="{wid}">{esc(w)}</span> '
+                js.append(f'tl.fromTo("#{wid}",{{opacity:0,y:26,filter:"blur(10px)"}},{{opacity:1,y:0,filter:"blur(0px)",duration:0.26,ease:"power3.out"}},{a - 0.04:.3f});')
+                k += 1
+        cl = 'pcap' + (' dark' if cdark else '') + (' box' if v.get('capbox') else '')
+        doc.html.append(f'<div id="{cid}" class="clip {cl}" data-start="{a0:.3f}" data-duration="{e0 - a0:.3f}" data-track-index="3" style="top:{cy}px;font-size:{fs}px"><div class="pin">{spans.strip()}</div></div>')
+        doc.js.append(f'gsap.set("#{cid}",{{yPercent:-50,z:110}});')
+        doc.js.append(f'tl.fromTo("#{cid} .pin",{{opacity:0}},{{opacity:1,duration:0.15}},{a0:.3f});')
+        doc.js += js
+        if e0 < end + 0.2:
+            doc.js.append(f'tl.to("#{cid} .pin",{{opacity:0,y:-18,filter:"blur(12px)",duration:0.2,ease:"power2.in"}},{e0 - 0.2:.3f});')
+
+
 def build_html(name, tl, total):
     doc = Doc()
     import specs as _sp
     doc.strong = name in getattr(_sp, 'STRONG3D', set())
     doc.shift = getattr(_sp, 'SHIFT_Y', {}).get(name, 0)
+    doc.capmode = getattr(_sp, 'CAPMODE', {}).get(name)
     # group beats into scenes
     scenes = []
     for i, b in enumerate(tl):
@@ -531,7 +579,9 @@ def build_html(name, tl, total):
             else:
                 render_item(doc, it, start, allw, end, [w for b in sc['beats'] for w in b['words']])
         # captions (one word at a time) inside the camera
-        if not v.get('nocap'):
+        if not v.get('nocap') and getattr(doc, 'capmode', None) == 'phrase':
+            phrase_caps(doc, sc, v, end, dark)
+        elif not v.get('nocap'):
             cy = v.get('capy', CAP_Y) + min(getattr(doc, 'shift', 0), 1840 - v.get('capy', CAP_Y))
             ws = [(w, e, a, z2) for b in sc['beats'] for (w, e), (a, z2) in zip(b['words'], b['wt'])]
             dark_t = None

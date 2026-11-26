@@ -130,3 +130,9 @@ VIDEOS['brand'] = BRAND3
 TRANS_BY['brand'] = _TR3
 STRONG3D.add('brand')
 CSS_EXTRA = {'brand': _CSS3}
+
+from brand4 import BRAND4, TRANS as _TR4, CSS as _CSS4
+VIDEOS['brand'] = BRAND4
+TRANS_BY['brand'] = _TR4
+CSS_EXTRA['brand'] = _CSS4
+CAPMODE = {'brand': 'phrase'}
