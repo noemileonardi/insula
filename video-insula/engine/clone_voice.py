@@ -12,7 +12,7 @@ SAY = [("Mikhail Varshavski", "Mikaìl Varsciàvski"), ("Grey's Anatomy", "Greis
        ("Dr. House", "Dottor Haus"), ("di brand", "di brend"), ("Il suo brand", "Il suo brend"), ("costruiamo brand", "costruiamo brend"),
        ("2017", "duemila diciassette"), ("2015", "duemila quindici"), ("2014", "duemila quattordici"), ("2009", "duemila nove"),
        ("glamour", "glàmur"), ("curriculum", "curricùlum"), ("YouTube", "Iutùb"), ("Instagram", "Ìnstagram"),
-       ("Smonta i miti", "Smonta, i miti"), ("Lui però", "Lui, però,"), ("New Jersey", "Niu Gèrsi")]
+       ("Smonta i miti", "Smonta, i miti"), ("Lui però", "Lui, però,"), ("New Jersey", "Niu Gèrsi"), ("TikTok", "Tic Toc"), ("The Good Doctor", "De Gud Dòctor"), ("The Checkup", "De Cèc ap"), ("2022", "duemila ventidue"), ("Dr. House", "Dottor Haus")]
 def say(t):
     for a, b in SAY: t = t.replace(a, b)
     return t.replace('«', '').replace('»', '').replace('…', '.')

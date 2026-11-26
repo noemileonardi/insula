@@ -561,7 +561,7 @@ def build_html(name, tl, total):
 <html lang="it" data-resolution="portrait">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=1080, height=1920"/>
 <script src="assets/js/gsap.min.js"></script>
-<style>{CSS}</style></head>
+<style>{CSS}{getattr(_sp, 'CSS_EXTRA', {}).get(name, '')}</style></head>
 <body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="{total:.3f}" data-width="1080" data-height="1920">
 {body}

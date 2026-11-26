@@ -9,7 +9,45 @@ Il medico che guarda deve pensare: *"questi risultati non sono fortuna: è un me
 
 ---
 
-## SCRIPT (voice-over)
+## TESTO DEFINITIVO DA REGISTRARE (montato nel video, una riga = una scena)
+
+1. Cinque miliardi e seicento milioni di visualizzazioni.
+2. Quindici milioni di iscritti su YouTube.
+3. Più di cinque milioni su Instagram. Tre su TikTok.
+4. E non è un attore, non è un influencer.
+5. È un medico di famiglia del New Jersey.
+6. Nel 2015 una rivista lo nomina «il dottore più sexy d'America».
+7. Aveva quasi un milione di follower.
+8. Per chiunque altro sarebbe stato il picco… e poi il nulla.
+9. Lui invece fa una scelta: smettere di essere il dottore bello e diventare il dottore di cui ti fidi.
+10. Leva numero uno: il nome.
+11. Mikhail Varshavski diventa Doctor Mike.
+12. Due parole: chi è e cosa fa. Lo ricordi dopo averlo sentito una volta.
+13. Leva numero due: parlare di ciò che la gente guarda già.
+14. Grey's Anatomy, Dr. House, le bufale dei social.
+15. «Questo in corsia succede davvero?» «Questo no.»
+16. La reazione a Grey's Anatomy: 33 milioni di visualizzazioni. Quella a The Good Doctor: 44 milioni.
+17. La curiosità c'era già. Lui ci ha aggiunto la competenza.
+18. Leva numero tre: la costanza.
+19. Due video a settimana, da quasi dieci anni. Più di milletrecento video.
+20. Nel 2017 assume un montatore. Poi una squadra.
+21. Nel 2022 lancia un podcast, The Checkup.
+22. Il suo canale non è un hobby: è organizzato come un ambulatorio.
+23. Leva numero quattro: la credibilità.
+24. E intanto continua a fare il medico.
+25. Quando sbaglia in un video, lo corregge pubblicamente.
+26. Ha creato una fondazione che finanzia borse di studio, e un evento di beneficenza ha raccolto oltre un milione di dollari.
+27. Ed è per questo che i brand della salute lo scelgono come volto.
+28. Tu non devi diventare Doctor Mike.
+29. Ti bastano le stesse quattro leve, nella tua città: un nome che si ricorda, contenuti che rispondono a ciò che i pazienti già cercano, una costanza che non dipende da quando hai tempo, e una credibilità che non metti mai in vendita.
+30. Noi di Insula costruiamo brand per medici, dal nome al primo video, nel rispetto del codice deontologico.
+31. Se vuoi capire quale potrebbe essere il tuo, commentami BRAND e ti scrivo in privato.
+
+> Registra con pause naturali tra le righe: silenzi, respiri ed eco li taglio io.
+
+---
+
+## SCRIPT (bozza strategica)
 
 ### 1. Gancio – il risultato prima di tutto (0:00–0:12)
 Cinque miliardi e seicento milioni di visualizzazioni.

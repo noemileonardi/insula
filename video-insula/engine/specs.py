@@ -123,3 +123,10 @@ VIDEOS['sito'] = SITO2
 TRANS_BY = {'sito': _TR2}
 STRONG3D = {'sito'}
 SHIFT_Y = {'sito': 80}
+
+# ---- video 3 v3: results-first case study, Insula editorial identity
+from brand3 import BRAND3, TRANS as _TR3, CSS as _CSS3
+VIDEOS['brand'] = BRAND3
+TRANS_BY['brand'] = _TR3
+STRONG3D.add('brand')
+CSS_EXTRA = {'brand': _CSS3}
