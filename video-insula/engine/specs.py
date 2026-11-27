@@ -10,7 +10,7 @@ def S(*items, **kw):
 
 BLANK = dict(items=[], capy=900)          # word-only scene, like "nessuno" / "quasi" in the reference
 DOC_A, DOC_B = '👩‍⚕️', '👨‍⚕️'
-TAIL = {'social': 2.2, 'sito': 2.2, 'brand': 2.2}
+TAIL = {'social': 2.2, 'sito': 2.2, 'brand': 3.0}
 
 # =====================================================================================
 SOCIAL = [

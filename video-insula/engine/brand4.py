@@ -191,7 +191,7 @@ def TIMELINE(steps, y=760, gap=380):
                f'tl.to("#ID .ic{i}",{{filter:"grayscale(0)",opacity:1,duration:0.3}},@T+0.1);')
         fx.append((a, js)); sf.append((a, 'pop'))
     last = steps[-1][2]
-    fx.append((last, f'tl.to("#ID .mv",{{x:0,scale:{min(1.0, 980 / W):.3f},duration:0.9,ease:"power3.inOut"}},@T+0.9);'))
+    fx.append((last, f'tl.to("#ID .mv",{{x:0,scale:{min(1.0, 860 / W):.3f},duration:0.9,ease:"power3.inOut"}},@T+0.9);'))
     first_x = W / 2 - 120 if n > 2 else 0
     fx.insert(0, (0, f'gsap.set("#ID .mv",{{x:{first_x}}});tl.fromTo("#ID .mv",{{opacity:0,filter:"blur(16px)"}},{{opacity:1,filter:"blur(0px)",duration:0.5}},@T);'))
     return H(html, 540, y, depth=60, fx=fx, sfxs=sf)
@@ -211,8 +211,8 @@ def AVATARS(at_one, at_all, n=10, R=330):
 
 def KINETIC(word, at=0, y=900):
     sp = ''.join(f'<span class="k{i}" style="display:inline-block">{ch}</span>' for i, ch in enumerate(word))
-    html = f'<div class="kw" style="font:300 330px Jost;letter-spacing:-.04em;color:#F4EEE3;white-space:nowrap">{sp}</div>'
-    js = 'tl.fromTo("#ID .kw",{x:700},{x:-700,duration:3.2,ease:"power1.inOut"},@T);'
+    html = f'<div class="kw" style="font:300 175px Jost;letter-spacing:-.03em;color:#F4EEE3;white-space:nowrap">{sp}</div>'
+    js = 'tl.fromTo("#ID .kw",{scale:1.6},{scale:1,duration:1.6,ease:"power3.out"},@T);'
     js += ''.join(f'tl.fromTo("#ID .k{i}",{{rotationY:-95,z:-600,opacity:0}},{{rotationY:0,z:0,opacity:1,duration:0.5,ease:"power3.out"}},@T+{i * 0.07:.2f});' for i in range(len(word)))
     return H(html, 540, y, depth=80, fx=[(at, js)], sfxs=[(at, 'whoosh'), (at, 'riser')])
 
@@ -221,7 +221,7 @@ def IGOUT(at):
            '<rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="url(#igg)" stroke-width="2"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="url(#igg)" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.2" fill="#EE2A7B"/></svg>')
     html = (f'<div style="text-align:center"><div class="ig" style="display:inline-block">{svg}</div>'
             f'<div class="hd" style="font:500 40px Jost;letter-spacing:.12em;color:#F4EEE3;margin-top:20px">@INSULAMEDICALAGENCY</div></div>')
-    return H(html, 540, 1060, depth=200, fx=[(at, 'tl.fromTo("#ID .ig",{scale:0,rotation:-120},{scale:1,rotation:0,duration:0.7,ease:"back.out(2)"},@T);'
+    return H(html, 540, 1260, depth=200, fx=[(at, 'tl.fromTo("#ID .ig",{scale:0,rotation:-120},{scale:1,rotation:0,duration:0.7,ease:"back.out(2)"},@T);'
                                                    'tl.fromTo("#ID .ig",{filter:"hue-rotate(0deg)"},{filter:"hue-rotate(300deg)",duration:3,ease:"none"},@T+0.7);'
                                                    'tl.fromTo("#ID .hd",{opacity:0,y:30},{opacity:1,y:0,duration:0.5},@T+0.4);')], sfxs=[(at, 'pop'), (at, 'sparkle')])
 
@@ -351,7 +351,7 @@ V = [
  # 24 portrait + panels
  S(PANELS(0.15, 'MEDICO'), GIANT('medico', 540, 640, 210, c=GREEN, it=True, at=0.1),
    CUT(M3 + 'i0631_cut.png', 540, 1200, 1100, (1206, 1487), in_='blur', idle=False),
-   BADGE('in attività', 540, 1620, at='medico', size=52, bg=GOLD, c=INK), capy=1760),
+   BADGE('in attività', 790, 1380, at='medico', size=50, bg=GOLD, c=INK), capy=1760),
  # 25 notes: correction
  S(NOTES('Il video', [('Un\'affermazione imprecisa', 0.1, 'strike'), ('Correzione pubblica ✓', 'corregge', 'gold')], y=700),
    VCARD('assets/mike_clips/mike_chirurgo.mp4', 540, 1260, 330, 470, -4, at='sbaglia'), capy=1640, capbox=True),
@@ -377,8 +377,8 @@ V = [
  S(RIBBON(0, 'rgba(205,184,216,.20)'),
    H(f'<div style="display:flex;align-items:center;gap:22px;padding:22px 30px;border-radius:999px;background:rgba(255,255,255,.95);width:760px;box-shadow:0 30px 70px rgba(0,0,0,.4)">'
      f'<div style="width:66px;height:66px;border-radius:50%;background:{GOLD}"></div><div style="flex:1;text-align:left;font:600 54px Jost;color:{INK}">{{{{TYPE:BRAND}}}}</div><div style="font:600 34px Jost;color:#3897F0">Pubblica</div></div>',
-     540, 640, depth=160, in_='blur', type_at='BRAND', rate=0.16),
-   IGOUT('privato'), dark=True, capy=900, capsize=60),
+     540, 600, depth=160, in_='blur', type_at='BRAND', rate=0.16),
+   IGOUT('privato'), dark=True, capy=860, capsize=60),
 ]
 
 EMPH = {
@@ -389,9 +389,9 @@ EMPH = {
     "Se vuoi capire quale potrebbe essere il tuo, / commentami *BRAND* / e ti scrivo in privato.": "Se vuoi capire quale potrebbe essere il tuo, / commentami *BRAND* / e ti scrivo in privato.",
 }
 BRAND4 = []
-for b, v in zip(BRAND3, V):
+for i, (b, v) in enumerate(zip(BRAND3, V)):
     t = EMPH.get(b['t'], b['t'])
-    BRAND4.append(dict(t=t, v=v))
+    BRAND4.append(dict(t=t, v=v, chapter=i in (9, 12, 17, 22, 27, 29)))
 assert len(BRAND4) == 31
 
 TRANS = [('{z:-700,opacity:0}', '{z:700,opacity:0}'),

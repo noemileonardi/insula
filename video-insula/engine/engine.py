@@ -232,11 +232,32 @@ def align_real_voice(beats, path):
         raw, c_src, c_dst = cut_word_gaps(raw, spans)
     else:
         c_src, c_dst = np.array([0, 1e6]), np.array([0, 1e6])
-    audio, s_src, s_dst = compress_silence(raw)
+    calm = '--calm' in sys.argv
+    audio, s_src, s_dst = compress_silence(raw, max_gap=float(os.environ.get('CALM_GAP', 0.45)), keep=float(os.environ.get('CALM_KEEP', 0.30))) if calm else compress_silence(raw)
     remap = lambda x: float(np.interp(np.interp(x, c_src, c_dst), s_src, s_dst))
     for b in tl:
         b['wt'] = [[remap(a0), remap(a1)] for a0, a1 in b['wt']]
         b['start'], b['end'] = b['wt'][0][0], b['wt'][-1][1]
+    if calm:
+        # give every scene room to land: a real breath between beats, longer before a new chapter
+        P = float(sys.argv[sys.argv.index('--calm') + 1]) if len(sys.argv) > sys.argv.index('--calm') + 1 and re.match(r'^[0-9.]+$', sys.argv[sys.argv.index('--calm') + 1]) else 0.7
+        pieces, shift, last = [], 0.0, 0
+        se = [(b['start'], b['end']) for b in tl]
+        for i, b in enumerate(tl):
+            if i:
+                pe, bs = se[i - 1][1], se[i][0]
+                lo, hi = int((pe - 0.05) * SR), int(max(bs, pe + 0.15) * SR)
+                w = int(0.02 * SR); best, ci = 1e9, int((pe + bs) / 2 * SR)
+                for q in range(lo, max(lo + 1, hi - w), int(0.005 * SR)):
+                    e = float(np.mean(audio[q:q + w] ** 2))
+                    if e < best: best, ci = e, q + w // 2
+                pieces.append(audio[last:ci]); last = ci
+                extra = P * (1.6 if b['beat'].get('chapter') else 1.0)
+                pieces.append(np.zeros(int(extra * SR), np.float32)); shift += extra
+            b['wt'] = [[a0 + shift, a1 + shift] for a0, a1 in b['wt']]
+            b['start'], b['end'] = b['wt'][0][0], b['wt'][-1][1]
+        pieces.append(audio[last:])
+        audio = np.concatenate(pieces)
     return audio, tl
 
 # ---------------------------------------------------------------- 3D icons
