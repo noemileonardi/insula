@@ -273,8 +273,8 @@ V = [
      fx=[(0, 'tl.fromTo("#ID .cr",{scale:0},{scale:1,duration:0.8,ease:"back.out(1.6)"},@T);')]),
    CARD('doctor.mike', 'ha iniziato a seguirti', 290, 380, at=0.3, w=420, blur=2, depth=-60, icon='♥'),
    CARD('Nuovo commento', '"Finalmente chiaro!"', 790, 560, at=0.6, w=400, blur=1, depth=-40, icon='💬'),
-   o(phone(f'<img src="assets/img/mike_ig_full.jpg" style="position:absolute;left:0;top:0;width:100%">', 540, 740, 0.7), **{'in': 'up', 'idle': True}),
-   o(phone(f'<img src="{M3}i0624.png" style="position:absolute;left:0;top:0;width:100%">', 540, 740, 0.7), **{'in': 'flip', 'at': 'TikTok'}),
+   o(phone(f'<img src="assets/img/mike_ig_full.jpg" style="position:absolute;left:0;top:0;width:100%"><img class="tk" src="{M4}tiktok_clean.png" style="position:absolute;left:0;top:0;width:100%;opacity:0;background:#fff">', 540, 740, 0.7),
+     **{'in': 'up', 'idle': True, 'fx': [('TikTok', 'tl.fromTo("#ID .tk",{opacity:0,filter:"blur(14px)",scale:1.08},{opacity:1,filter:"blur(0px)",scale:1,duration:0.45,ease:"power2.out"},@T);')], 'sfxs': [('TikTok', 'swipe')]}),
    H(f'<div class="n1" style="font:300 190px Jost;letter-spacing:-.03em;color:{INK}">5,6 Mln</div>', 540, 1250, depth=220,
      fx=[(0.4, 'tl.fromTo("#ID .n1",{opacity:0,filter:"blur(20px)",scale:1.2},{opacity:1,filter:"blur(0px)",scale:1,duration:0.6},@T);'),
          ('Tre', 'tl.to("#ID .n1",{opacity:0,filter:"blur(20px)",duration:0.3},@T-0.3);')]),
@@ -285,8 +285,8 @@ V = [
  S(LINES(0), capy=900, capsize=74, capmax=4),
  # 5 portrait + diagonal green panels + layered giant words
  S(PANELS(0.2, 'MEDICO'),
-   GIANT('Doctor', 540, 600, 220, c=GREEN, op=1, at=0.1, it=True),
    CUT('assets/img/mike_palco_cut.png', 560, 1150, 1250, (1206, 1481), in_='blur', idle=False),
+   GIANT('Doctor', 540, 930, 210, c='#F4EEE3', op=1, at=0.1, it=True, extra='text-shadow:0 8px 34px rgba(15,30,23,.55),0 2px 6px rgba(15,30,23,.45);'),
    H(f'<div class="mf" style="font:600 92px Jost;letter-spacing:-.02em;color:#F4EEE3;white-space:nowrap">medico di famiglia</div>', 540, 1580, depth=240,
      fx=[('medico', 'tl.fromTo("#ID .mf",{scaleX:2.4,opacity:0,filter:"blur(16px)"},{scaleX:1,opacity:1,filter:"blur(0px)",duration:0.6,ease:"power4.out"},@T);')], sfxs=[('medico', 'boom')]),
    BADGE('New Jersey, USA', 540, 1440, at='Jersey', size=46, bg=GOLD), capy=300, capbox=True),
@@ -340,7 +340,7 @@ V = [
  S(AVATARS('montatore', 'squadra'), dark=True, capy=860, capsize=62),
  # 21 dark: podcast cards
  S(VCARD(M3 + 'podcast_ospite.mp4', 330, 640, 430, 600, -7, at=0),
-   VCARD('assets/mike_clips/mike_podcast.mp4', 760, 980, 400, 560, 6, at='podcast'),
+   VCARD(M4 + 'podcast_clean.mp4', 760, 960, 440, 404, 6, at='podcast'),
    VCARD(M3 + 'i0627.png', 330, 1330, 380, 420, 4, at='Checkup', k='img'),
    BADGE('★ 4,9 su Spotify', 760, 1420, at='Checkup', size=44, bg=GOLD, c=INK), RIBBON(0, 'rgba(205,184,216,.15)'), dark=True, capy=1680),
  # 22 dark: giant kinetic word + ghost 'hobby'

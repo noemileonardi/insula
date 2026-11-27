@@ -8,11 +8,11 @@ import torch, torchaudio
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REF = os.path.join(ROOT, 'voice', 'ref_clean.wav')     # 11 s of the client's AI-restored voice (no room echo)
 OUT = os.path.join(ROOT, 'cache', 'cbx_clean')
-SAY = [("Mikhail Varshavski", "Mikaìl Varsciàvski"), ("Grey's Anatomy", "Greis Anàtomi"), ("Doctor Mike", "Dòctor Maik"),
-       ("Dr. House", "Dottor Haus"), ("di brand", "di brend"), ("Il suo brand", "Il suo brend"), ("costruiamo brand", "costruiamo brend"),
+SAY = [("Mikhail Varshavski", "Mikaìl Varsciàvschi"), ("Grey's Anatomy", "Greis Anàtomi"), ("Doctor Mike", "Dòctor Maik"),
+       ("Dr. House", "Dottor Àus"), ("di brand", "di brend"), ("Il suo brand", "Il suo brend"), ("costruiamo brand", "costruiamo brend"),
        ("2017", "duemila diciassette"), ("2015", "duemila quindici"), ("2014", "duemila quattordici"), ("2009", "duemila nove"),
        ("glamour", "glàmur"), ("curriculum", "curricùlum"), ("YouTube", "Iutùb"), ("Instagram", "Ìnstagram"),
-       ("Smonta i miti", "Smonta, i miti"), ("Lui però", "Lui, però,"), ("New Jersey", "Niu Gèrsi"), ("TikTok", "Tic Toc"), ("The Good Doctor", "De Gud Dòctor"), ("The Checkup", "De Cèc ap"), ("2022", "duemila ventidue"), ("Dr. House", "Dottor Haus")]
+       ("Smonta i miti", "Smonta, i miti"), ("Lui però", "Lui, però,"), ("New Jersey", "Niu Gèrsi"), ("TikTok", "Tic Toc"), ("The Good Doctor", "De Gud Dòctor"), ("The Checkup", "De Cèc-àp"), ("2022", "duemila ventidue"), ("Dr. House", "Dottor Àus")]
 def say(t):
     for a, b in SAY: t = t.replace(a, b)
     return t.replace('«', '').replace('»', '').replace('…', '.')
